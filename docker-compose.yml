@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: . # Ruta al directorio donde se encuentra el Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html # Montamos el directorio del proyecto en el contenedor
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Fernad0101
+    volumes:
+      - dbdata:/var/opt/mssql
+    ports:
+      - "1433:1433"
+  
+volumes:
+  dbdata: {}

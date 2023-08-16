@@ -9,11 +9,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         unixodbc \
         unixodbc-dev \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql17 \
-    && pecl install sqlsrv pdo_sqlsrv \
-    && docker-php-ext-enable sqlsrv pdo_sqlsrv
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && pecl install sqlsrv \
+    && pecl install pdo_sqlsrv \
+    && docker-php-ext-enable sqlsrv \
+    && docker-php-ext-enable pdo_sqlsrv
 
 # Habilita el módulo de Apache mod_rewrite
 RUN a2enmod rewrite

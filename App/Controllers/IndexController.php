@@ -1,6 +1,10 @@
 <?php
 
 class IndexController extends Controller {
+
+    public function __construct(PDO $con) {
+
+    }
     public function index() {
         // require_once(__DIR__.'/../Views/login.view.php');
         $this->render('index', [], 'index');

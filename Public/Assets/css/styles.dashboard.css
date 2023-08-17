@@ -10,12 +10,18 @@
   --darkgrey: #575756;
   --grey: #9d9d9d;
   --darkred: #841816;
-  --cream: #F8B688;
+  --cream: #f8b688;
   --bs-body-font-family: "Helvetica", "Arial", sans-serif;
 }
-.btn-danger { background-color: var(--red) !important;}
-.btn-secondary { background-color: var(--darkgrey) !important;}
-.bg-info {background-color: var(--cream) !important;}
+.btn-danger {
+  background-color: var(--red) !important;
+}
+.btn-secondary {
+  background-color: var(--darkgrey) !important;
+}
+.bg-info {
+  background-color: var(--cream) !important;
+}
 *,
 ::before,
 ::after {
@@ -68,7 +74,13 @@ a {
   width: var(--nav-width);
   height: 100vh;
   /* background-color: var(--darkred); */
-  background: linear-gradient(to bottom right, var(--red), var(--orange), var(--orange2), var(--yellow));
+  background: linear-gradient(
+    to bottom right,
+    var(--red),
+    var(--orange),
+    var(--orange2),
+    var(--yellow)
+  );
   padding: 0.5rem 1rem 0 0;
   transition: 0.5s;
   z-index: var(--z-fixed);
@@ -176,4 +188,18 @@ a {
   .div_icon {
     text-align: center;
   }
+}
+.pagination .page-item.active .page-link {
+  background-color: var(--red);
+  border-color: var(--red);
+}
+div.dataTables_wrapper
+  div.dataTables_paginate
+  ul.pagination
+  .page-item.active
+  .page-link:focus {
+  background-color: var(--darkred);
+}
+.pagination .page-item.active .page-link:hover {
+  background-color: var(--darkred);
 }

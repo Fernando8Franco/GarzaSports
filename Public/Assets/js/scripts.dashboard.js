@@ -65,24 +65,27 @@ const initDataTableEvents = async () => {
   }
 
   try {
-    const response = await fetch("http://localhost/public/events/tables");
-    if (!response.ok) {
-      throw new Error("Error fetching data");
-    }
-
-    const data = await response.json();
-
-    // Aquí 'data' contendrá los datos en formato JSON
-    console.log(data);
+    var idEvent, option;
+    option = 4;
 
     dataTable = new DataTable("#datatable_events", {
-      data: data,
+      ajax: {
+        url: "http://localhost/public/events/eventsCRUD",
+        method: "POST",
+        data: { option: option },
+        dataSrc: "",
+      },
       columns: [
+        { data: "id", visible: false },
         { data: "name" },
         { data: "start_date" },
         { data: "end_date" },
         { data: "ins_start_date" },
         { data: "ins_end_date" },
+        {
+          defaultContent:
+            "<div class='text-center'><button class='btn btn-primary btn-sm'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+        },
       ],
       language: dataTableLanguage,
     });
@@ -93,13 +96,76 @@ const initDataTableEvents = async () => {
   }
 };
 
-document.getElementById('events_link').addEventListener('htmx:afterRequest', async function () {
-  await initDataTableEvents();
-});
+document
+  .getElementById("events_link")
+  .addEventListener("htmx:afterRequest", async function () {
+    await initDataTableEvents();
 
-$(document).ready(function() {
-  // This code initializes the modal and handles its behavior
-  $('#addEvent').click(function() {
-    $('#modalEvent').modal('show');
+    document
+      .getElementById("eventForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent the default form submission behavior (page reload)
+
+        // Get form input values
+        var name = document.getElementById("nameEvent").value.trim();
+        var start_event = document.getElementById("start_event").value.trim();
+        var end_event = document.getElementById("end_event").value.trim();
+        var ins_start_event = document
+          .getElementById("ins_start_event")
+          .value.trim();
+        var ins_end_event = document
+          .getElementById("ins_end_event")
+          .value.trim();
+
+        if (name === "") {
+          alert("Por favor, ingresa un nombre para el evento.");
+          return;
+        }
+
+        if (
+          start_event === "" ||
+          end_event === "" ||
+          ins_start_event === "" ||
+          ins_end_event === ""
+        ) {
+          alert("Por favor, llenar todas las fechas");
+          return;
+        }
+
+        var formData = new FormData();
+        formData.append("id", idEvent);
+        formData.append("name", name);
+        formData.append("start_event", start_event);
+        formData.append("end_event", end_event);
+        formData.append("ins_start_event", ins_start_event);
+        formData.append("ins_end_event", ins_end_event);
+        formData.append("option", option);
+
+        // Send data using Fetch API
+        fetch("http://localhost/public/events/eventsCRUD", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Assuming tablaUsuarios is a DataTable, reload it
+            dataTable.ajax.reload(null, false);
+
+            var modal = new bootstrap.Modal(document.getElementById("modalEvent"));
+            modal.hide();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+
+          var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEvent'));
+          myModal.hide();
+      });
+
+    document.getElementById("addEvent").addEventListener("click", function () {
+      option = 1;
+      idEvent = null;
+      document.getElementById("eventForm").reset();
+      document.querySelector(".modal-title").textContent = "Agregar Evento";
+    });
   });
-});

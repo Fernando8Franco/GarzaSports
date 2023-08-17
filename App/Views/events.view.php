@@ -9,7 +9,7 @@
     <div class="col-lg-12">
       <button id="addEvent" type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal"
         data-bs-target="#modalEvent">
-        Agregar Evento 
+        Agregar Evento
         <i class="fa-regular fa-calendar-plus"></i>
       </button>
     </div>
@@ -19,13 +19,13 @@
   <table id="datatable_events" class="table table-bordered table-striped" style="width:100%">
     <thead>
       <tr>
+        <th>id</th>
         <th>Nombre Evento</th>
         <th>Inicio Evento</th>
         <th>Finalización Evento</th>
         <th>Inicio inscripción al evento</th>
         <th>Fin inscripción al evento</th>
-        <th>Editar</th>
-        <th>Eliminar</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -37,12 +37,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Agregar Evento</h5>
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <form method="POST" id="formulario" enctype="multipart/form-data">
-          <div class="modal-content border-0">
+      <form id="eventForm" enctype="multipart/form-data">
+        <div class="modal-content border-0">
+          <div class="modal-body">
             <div class="form-floating">
               <input type="text" class="form-control mb-4" id="nameEvent" placeholder="Nombre del Evento">
               <label for="nameEvent">Nombre del evento</label>
@@ -72,16 +72,13 @@
               </div>
             </div>
           </div>
-        </form>
-        <div class="modal-footer justify-content-center">
-          <input type="hidden" name="id_event" id="id_event">
-          <input type="hidden" name="operation" id="operation">
-          <button type="submit" name="action" id="action" class="btn btn-danger btn-lg mt-3">
-            Agregar 
-            <i class="far fa-calendar-check"></i>
-          </button>
+          <div class="modal-footer justify-content-center">
+            <button type="submit" name="action" id="action" class="btn btn-danger btn-lg">
+              Agregar  <i class="far fa-calendar-check"></i>
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>

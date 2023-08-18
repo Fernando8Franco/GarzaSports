@@ -193,13 +193,19 @@ a {
   background-color: var(--red);
   border-color: var(--red);
 }
+.page-link {
+  color: var(--darkgrey);
+}
+.page-link:hover {
+  color: var(--orange2);
+}
 div.dataTables_wrapper
   div.dataTables_paginate
   ul.pagination
   .page-item.active
   .page-link:focus {
-  background-color: var(--darkred);
+  background-color: var(--red);
 }
 .pagination .page-item.active .page-link:hover {
-  background-color: var(--darkred);
+  background-color: var(--red);
 }

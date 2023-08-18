@@ -39,6 +39,28 @@ class EventsController extends Controller
                 break;
         }
 
+        $spanishMonthNames = array(
+            'Jan' => 'Ene',
+            'Feb' => 'Feb',
+            'Mar' => 'Mar',
+            'Apr' => 'Abr',
+            'May' => 'May',
+            'Jun' => 'Jun',
+            'Jul' => 'Jul',
+            'Aug' => 'Ago',
+            'Sep' => 'Sep',
+            'Oct' => 'Oct',
+            'Nov' => 'Nov',
+            'Dec' => 'Dic'
+        );
+        
+        foreach ($events as &$event) {
+            $event['start_date'] = strtr($event['start_date'], $spanishMonthNames);
+            $event['end_date'] = strtr($event['end_date'], $spanishMonthNames);
+            $event['ins_start_date'] = strtr($event['ins_start_date'], $spanishMonthNames);
+            $event['ins_end_date'] = strtr($event['ins_end_date'], $spanishMonthNames);
+        }
+
         echo json_encode($events, JSON_UNESCAPED_UNICODE);
     }
 }

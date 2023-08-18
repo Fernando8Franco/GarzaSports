@@ -15,7 +15,7 @@
     </div>
   </div>
 </div>
-<div class="container table-responsive">
+<div class="container table-responsive pt-2">
   <table id="datatable_events" class="table table-bordered table-striped" style="width:100%">
     <thead>
       <tr>
@@ -44,18 +44,18 @@
         <div class="modal-content border-0">
           <div class="modal-body">
             <div class="form-floating">
-              <input type="text" class="form-control mb-4" id="nameEvent" placeholder="Nombre del Evento">
-              <label for="nameEvent">Nombre del evento</label>
+              <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento" required>
+              <label for="name">Nombre del evento</label>
             </div>
             <div class="col-12">
               <div class="row">
                 <div class="col-6">
                   <label>Inicio del evento</label>
-                  <input type="date" name="start_event" id="start_event" class="form-control mb-4">
+                  <input type="date" name="start_event" id="start_event" class="form-control mb-4" required>
                 </div>
                 <div class="col-6">
                   <label>Finalización del evento</label>
-                  <input type="date" name="end_event" id="end_event" class="form-control">
+                  <input type="date" name="end_event" id="end_event" class="form-control" required>
                 </div>
               </div>
             </div>
@@ -63,11 +63,11 @@
               <div class="row">
                 <div class="col-6">
                   <label>Inicio inscripción</label>
-                  <input type="date" name="ins_start_event" id="ins_start_event" class="form-control mb-4">
+                  <input type="date" name="ins_start_event" id="ins_start_event" class="form-control mb-4" required>
                 </div>
                 <div class="col-6">
                   <label>Finalización inscripción</label>
-                  <input type="date" name="ins_end_event" id="ins_end_event" class="form-control">
+                  <input type="date" name="ins_end_event" id="ins_end_event" class="form-control" required>
                 </div>
               </div>
             </div>

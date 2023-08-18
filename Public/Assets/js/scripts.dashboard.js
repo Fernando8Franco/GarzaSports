@@ -36,6 +36,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
   // Your code to run since DOM is loaded and ready
 });
 
+function convertMonth(month) {
+  const months = {
+    "Ene": "01", "Feb": "02", "Mar": "03", "Abr": "04", "May": "05", "Jun": "06",
+    "Jul": "07", "Ago": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dic": "12"
+  };
+  return months[month];
+}
+
 const dataTableLanguage = {
   sProcessing: "Procesando...",
   sLengthMenu: "Mostrar _MENU_ registros",
@@ -84,7 +92,14 @@ const initDataTableEvents = async () => {
         { data: "ins_end_date" },
         {
           defaultContent:
-            "<div class='text-center'><button class='btn btn-primary btn-sm'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+            "<div class='text-center'><button class='btn btn-primary btn-sm editBtn'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtn'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+        },
+      ],
+      order: [[0, "desc"]],
+      columnDefs: [
+        {
+          targets: 1, // Target the "name" column (index 1)
+          orderData: [0], // Use data from the "id" column (index 0) for ordering
         },
       ],
       language: dataTableLanguage,
@@ -103,64 +118,99 @@ document
 
     document
       .getElementById("eventForm")
-      .addEventListener("submit", function (e) {
+      .addEventListener("submit", async (e) => {
         e.preventDefault(); // Prevent the default form submission behavior (page reload)
 
+        const form = e.target;
+        const submitButton = form.querySelector("#action"); // Get the submit button
+        submitButton.disabled = true; // Disable the submit button to prevent multiple clicks
+
+        //Hide Modal
+        var myModal = bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("modalEvent")
+        );
+        myModal.hide();
+
         // Get form input values
-        var name = document.getElementById("nameEvent").value.trim();
-        var start_event = document.getElementById("start_event").value.trim();
-        var end_event = document.getElementById("end_event").value.trim();
-        var ins_start_event = document
-          .getElementById("ins_start_event")
-          .value.trim();
-        var ins_end_event = document
-          .getElementById("ins_end_event")
-          .value.trim();
-
-        if (name === "") {
-          alert("Por favor, ingresa un nombre para el evento.");
-          return;
-        }
-
-        if (
-          start_event === "" ||
-          end_event === "" ||
-          ins_start_event === "" ||
-          ins_end_event === ""
-        ) {
-          alert("Por favor, llenar todas las fechas");
-          return;
-        }
-
-        var formData = new FormData();
-        formData.append("id", idEvent);
-        formData.append("name", name);
-        formData.append("start_event", start_event);
-        formData.append("end_event", end_event);
-        formData.append("ins_start_event", ins_start_event);
-        formData.append("ins_end_event", ins_end_event);
+        const formData = new FormData(form);
         formData.append("option", option);
 
-        // Send data using Fetch API
-        fetch("http://localhost/public/events/eventsCRUD", {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            // Assuming tablaUsuarios is a DataTable, reload it
+        try {
+          const response = await fetch(
+            "http://localhost/public/events/eventsCRUD",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
             dataTable.ajax.reload(null, false);
-
-            var modal = new bootstrap.Modal(document.getElementById("modalEvent"));
-            modal.hide();
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-
-          var myModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEvent'));
-          myModal.hide();
+          } else {
+            console.error("Error:", response.statusText);
+            alert("No se pudo crear la fecha.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("No se pudo crear la fecha.");
+        } finally {
+          submitButton.disabled = false; // Re-enable the submit button after the response is received
+        }
       });
+
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("editBtn")) {
+        opcion = 2;
+        var row = e.target.closest("tr");
+
+        var rowData = dataTable.row(row).data();
+
+        idEvent = parseInt(rowData.id); // Access the "id" value
+        nameEvent = rowData.name;
+        end_event = rowData.end_date;
+        ins_start_event = rowData.ins_start_date;
+        ins_end_event = rowData.ins_end_date;
+
+        var dateParts = rowData.start_date.split(" ");
+        var startDay = dateParts[0];
+        var startMonth = convertMonth(dateParts[1]);
+        var startYear = dateParts[2];
+        start_event = `${startYear}-${startMonth}-${startDay}`;
+
+        dateParts = rowData.end_date.split(" ");
+        startDay = dateParts[0];
+        startMonth = convertMonth(dateParts[1]);
+        startYear = dateParts[2];
+        end_event = `${startYear}-${startMonth}-${startDay}`;
+
+
+        dateParts = rowData.ins_start_date.split(" ");
+        startDay = dateParts[0];
+        startMonth = convertMonth(dateParts[1]);
+        startYear = dateParts[2];
+        ins_start_event = `${startYear}-${startMonth}-${startDay}`;
+        
+        dateParts = rowData.ins_end_date.split(" ");
+        startDay = dateParts[0];
+        startMonth = convertMonth(dateParts[1]);
+        startYear = dateParts[2];
+        ins_end_event = `${startYear}-${startMonth}-${startDay}`;
+
+        document.getElementById("name").value = nameEvent;
+        document.getElementById("start_event").value = start_event;
+        document.getElementById("end_event").value = end_event;
+        document.getElementById("ins_start_event").value = ins_start_event;
+        document.getElementById("ins_end_event").value = ins_end_event;
+
+        var modalTitle = document.querySelector(".modal-title");
+        modalTitle.textContent = "Editar Evento";
+
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById("modalEvent"));
+        modal.show();
+      }
+    });
 
     document.getElementById("addEvent").addEventListener("click", function () {
       option = 1;

@@ -19,19 +19,28 @@ class EventsController extends Controller
 
     public function eventsCRUD()
     {
-        header('Content-Type: application/json');
-        $name = (isset($_POST['name'])) ? $_POST['name'] : '';
-        $start_event = (isset($_POST['start_event'])) ? $_POST['start_event'] : '';
-        $end_event = (isset($_POST['end_event'])) ? $_POST['end_event'] : '';
-        $ins_start_event = (isset($_POST['ins_start_event'])) ? $_POST['ins_start_event'] : '';
-        $ins_end_event = (isset($_POST['ins_end_event'])) ? $_POST['ins_end_event'] : '';
+        $data = [
+            'id' => $_POST['idEvent'] ?? '',
+            'name' => $_POST['name'] ?? '',
+            'start_date' => $_POST['start_event'] ?? '',
+            'end_date' => $_POST['end_event'] ?? '',
+            'ins_start_date' => $_POST['ins_start_event'] ?? '',
+            'ins_end_date' => $_POST['ins_end_event'] ?? ''
+        ];
 
-        $option = (isset($_POST['option'])) ? $_POST['option'] : '';
-        $idEvent = (isset($_POST['idEvent'])) ? $_POST['idEvent'] : '';
+        $option = $_POST['option'] ?? '';
 
         switch ($option) {
             case 1:
-                $this->eventModel->insert($name, $start_event, $end_event, $ins_start_event, $ins_end_event);
+                $this->eventModel->insert($data);
+                $events = $this->eventModel->getAllDates();
+                break;
+            case 2:
+                $this->eventModel->updateById($data['id'], $data);
+                $events = $this->eventModel->getAllDates();
+                break;
+            case 3:
+                $this->eventModel->deleteById($data['id']);
                 $events = $this->eventModel->getAllDates();
                 break;
             case 4:
@@ -53,7 +62,7 @@ class EventsController extends Controller
             'Nov' => 'Nov',
             'Dec' => 'Dic'
         );
-        
+
         foreach ($events as &$event) {
             $event['start_date'] = strtr($event['start_date'], $spanishMonthNames);
             $event['end_date'] = strtr($event['end_date'], $spanishMonthNames);

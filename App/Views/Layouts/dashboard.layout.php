@@ -21,6 +21,7 @@
 <body id="body-pd">
     <?= $content ?>
     <!-- Scripts -->
+    <script> const URL_PATH = "<?= URL_PATH ?>"; </script>
     <script src="<?= URL_PATH ?>/assets/bootstrap-5/js/bootstrap.bundle.min.js"></script>
     <script src="<?= URL_PATH ?>/assets/js/htmx-1.9.min.js"></script>
     <script src="<?= URL_PATH ?>/assets/datatables/js/code.jquery.com_jquery-3.7.0.js"></script>

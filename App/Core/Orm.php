@@ -15,18 +15,10 @@ class Orm {
         return $stm->fetchAll();
     }
 
-    public function getIdByName($name) {
-        $stm = $this->db->prepare("SELECT id FROM {$this->table} WHERE name = :name");
-        $stm->bindParam(':name', $name, PDO::PARAM_STR);
+    public function deleteById($id) {
+        $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        $stm->bindValue(':id', $id);
         $stm->execute();
-        return $stm->fetch();
-    }
-
-    public function getByName($name) {
-        $stm = $this->db->prepare("SELECT * FROM {$this->table} WHERE name = :name");
-        $stm->bindParam(':name', $name, PDO::PARAM_STR);
-        $stm->execute();
-        return $stm->fetch();
     }
 
     public function deleteByName($name) {
@@ -38,17 +30,47 @@ class Orm {
     public function updateById($id, $data) {
         $sql = "UPDATE {$this->table} SET ";
         foreach ($data as $key => $value) {
-            $sql .= "{$key} = :{$key},";
+            if ($key != "id") {
+                $sql .= "{$key} = :{$key},";
+            }
         }
         $sql = trim($sql, ',');
         $sql .= " WHERE id = :id ";
         $stm = $this->db->prepare($sql);
 
         foreach($data as $key => $value) {
+            if ($key != "id") {
             $stm->bindValue(":{$key}", $value);
+            }
         }
 
-        $stm->bindParam(":id", $id,  PDO::PARAM_INT);
+        $stm->bindValue(":id", $id);
+        $stm->execute();
+    }
+
+    public function insert($data) {
+        $sql = "INSERT INTO {$this->table} (";
+        foreach ($data as $key => $value) {
+            if ($key != "id") {
+                $sql .= "{$key},";
+            }
+        }
+        $sql = trim($sql, ',');
+        $sql .= ") VALUES (";
+        foreach ($data as $key => $value) {
+            if ($key != "id") {
+                $sql .= ":{$key},";
+            }
+        }
+        $sql = trim($sql, ',');
+        $sql .= ")";
+
+        $stm = $this->db->prepare($sql);
+        foreach ($data as $key => $value) {
+            if ($key != "id") {
+                $stm->bindValue(":{$key}", $value);
+            }
+        }
         $stm->execute();
     }
     
@@ -61,19 +83,8 @@ class Orm {
         CONVERT(VARCHAR(11), start_date, 106) as start_date, 
         CONVERT(VARCHAR(11), end_date, 106) as end_date, 
         CONVERT(VARCHAR(11), ins_start_date, 106) as ins_start_date, 
-        CONVERT(VARCHAR(11), ins_end_date, 106) as ins_end_date FROM event ORDER BY id DESC");
+        CONVERT(VARCHAR(11), ins_end_date, 106) as ins_end_date FROM {$this->table}");
         $stm->execute();
         return $stm->fetchAll();
-    }
-
-    public function insert($name, $start_event, $end_event, $ins_start_event, $ins_end_event) {
-        $stm = $this->db->prepare("INSERT INTO {$this->table} (name, start_date, end_date, ins_start_date, ins_end_date)
-        VALUES (:name, :start_event, :end_event, :ins_start_event, :ins_end_event)");
-        $stm->bindParam(":name", $name);
-        $stm->bindParam(":start_event", $start_event);
-        $stm->bindParam(":end_event", $end_event);
-        $stm->bindParam(":ins_start_event", $ins_start_event);
-        $stm->bindParam(":ins_end_event", $ins_end_event);
-        $stm->execute();
     }
 }

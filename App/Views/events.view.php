@@ -43,8 +43,10 @@
       <form id="eventForm" enctype="multipart/form-data">
         <div class="modal-content border-0">
           <div class="modal-body">
+            <input type="hidden" name="idEvent" id="idEvent">
             <div class="form-floating">
-              <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento" required>
+              <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento"
+                required>
               <label for="name">Nombre del evento</label>
             </div>
             <div class="col-12">
@@ -74,7 +76,7 @@
           </div>
           <div class="modal-footer justify-content-center">
             <button type="submit" name="action" id="action" class="btn btn-danger btn-lg">
-              Agregar  <i class="far fa-calendar-check"></i>
+
             </button>
           </div>
         </div>

@@ -1,3 +1,10 @@
+<?php
+$meses = array(
+  1 => 'Ene', 2 => 'Feb', 3 => 'Mar', 4 => 'Abr',
+  5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Ago',
+  9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dic'
+);
+?>
 <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-5 border-bottom border-4 border-dark text-center">
         <span class="fw-bold text-dark" style="font-size: 45px">NOMBRE EVENTO</span>
@@ -14,7 +21,7 @@
           <div class="m-auto text-center fw-bold txt_start">
             Fecha Inicio - Fin:
             <br>
-            7
+            <?= date("d ") . $meses[date("n")] . date(" Y") ?>
           </div>
         </div>
     </div>

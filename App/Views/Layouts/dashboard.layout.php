@@ -1,3 +1,9 @@
+<?php
+if (!isset($_SESSION['name_s'])) {
+    header("Location: " . URL_PATH . "/admin");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es" id="htmlLogin">
 
@@ -26,7 +32,8 @@
     <script src="<?= URL_PATH ?>/assets/js/htmx-1.9.min.js"></script>
     <script src="<?= URL_PATH ?>/assets/datatables/js/code.jquery.com_jquery-3.7.0.js"></script>
     <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_jquery.dataTables.min.js"></script>
-    <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_dataTables.bootstrap5.min.js"></script>
+    <script
+        src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_dataTables.bootstrap5.min.js"></script>
     <script src="<?= URL_PATH ?>/assets/js/scripts.dashboard.js"></script>
 </body>
 

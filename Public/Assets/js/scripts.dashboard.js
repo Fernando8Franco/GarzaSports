@@ -54,6 +54,20 @@ function convertMonth(month) {
   return months[month];
 }
 
+const formatDate = (dateString) => {
+  const [day, monthStr, year] = dateString.split(" ");
+  const month = convertMonth(monthStr);
+  return `${year}-${month}-${day}`;
+};
+
+const formatStatus = (status) => {
+  if (status == '<i class="fa-solid fa-xmark"></i>') {
+    return 0;
+  } else if (status == '<i class="fa-solid fa-check"></i>') {
+    return 1;
+  }
+};
+
 const dataTableLanguage = {
   sProcessing: "Procesando...",
   sLengthMenu: "Mostrar _MENU_ registros",
@@ -74,44 +88,29 @@ const dataTableLanguage = {
   },
 };
 
-async function sendDataCRUD(data, table) {
-  try {
-    const response = await fetch(
-      URL_PATH + "/events/" + table + "CRUD",
-      {
-        method: "POST",
-        body: data,
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      dataTable.ajax.reload(null, false);
-    } else {
-      console.error("Error:", response.statusText);
-      alert("No se pudo crear la fecha.");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("No se pudo crear la fecha.");
-  }
-}
-
 let dataTable;
 let dataTableIsInitialized = false;
 
-const initDataTableEvents = async (table, columns) => {
-  if (dataTableIsInitialized) {
-    dataTable.destroy();
-  }
-
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION FOR CREATE THE DATATABLE
+//
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+const initDataTable = async (table, columns) => {
   try {
-    var idEvent, option;
+    if (dataTableIsInitialized) {
+      dataTable.destroy();
+      dataTableIsInitialized = false;
+    }
+
+    var option;
     option = 4;
 
-    dataTable = new DataTable("#datatable_events", {
+    dataTable = new DataTable("#datatable", {
       ajax: {
-        url: URL_PATH + "/events/" + table + "CRUD",
+        url: URL_PATH + "/" + table + "/" + table + "CRUD",
         method: "POST",
         data: { option: option },
         dataSrc: "",
@@ -133,212 +132,255 @@ const initDataTableEvents = async (table, columns) => {
   }
 };
 
-document
-  .getElementById("events_link")
-  .addEventListener("htmx:afterRequest", async function () {
-    const table = "events";
-    const columns = [
-      { data: "id", visible: false },
-      { data: "name" },
-      { data: "start_date" },
-      { data: "end_date" },
-      { data: "ins_start_date" },
-      { data: "ins_end_date" },
-      {
-        defaultContent:
-          "<div class='text-center'><button class='btn btn-primary btn-sm editBtn' data-bs-toggle='modal' data-bs-target='#modalEvent'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtn'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
-      },
-    ];
-    await initDataTableEvents(table, columns);
+// Call this function to reset the DataTable
+const resetDataTable = () => {
+  if (dataTableIsInitialized) {
+    dataTable.destroy();
+    dataTableIsInitialized = false;
+  }
+};
 
-    document
-      .getElementById("eventForm")
-      .addEventListener("submit", async (e) => {
-        e.preventDefault(); // Prevent the default form submission behavior (page reload)
+// Example usage:
+// Call resetDataTable() whenever you want to completely reset the DataTable.
 
-        const form = e.target;
-        const submitButton = form.querySelector("#action"); // Get the submit button
-        submitButton.disabled = true; // Disable the submit button to prevent multiple clicks
-
-        //Hide Modal
-        var myModal = bootstrap.Modal.getOrCreateInstance(
-          document.getElementById("modalEvent")
-        );
-        myModal.hide();
-
-        // Get form input values
-        const formData = new FormData(form);
-        formData.append("option", option);
-
-        sendDataCRUD(formData, table);
-        submitButton.disabled = false;
-      });
-
-    document.getElementById("addEvent").addEventListener("click", function () {
-      option = 1;
-      idEvent = null;
-      document.getElementById("eventForm").reset();
-      document.querySelector(".modal-title").textContent = "Agregar Evento";
-      document.getElementById("action").innerHTML =
-        "Agregar <i class='far fa-calendar-check'></i>";
-    });
-
-    document.addEventListener("click", function (e) {
-      if (e.target && e.target.classList.contains("editBtn")) {
-        option = 2;
-        var row = e.target.closest("tr");
-        var rowData = dataTable.row(row).data();
-
-        const formatDate = (dateString) => {
-          const [day, monthStr, year] = dateString.split(" ");
-          const month = convertMonth(monthStr);
-          return `${year}-${month}-${day}`;
-        };
-
-        idEvent = parseInt(rowData.id); // Access the "id" value
-        nameEvent = rowData.name;
-        start_event = formatDate(rowData.start_date);
-        end_event = formatDate(rowData.end_date);
-        ins_start_event = formatDate(rowData.ins_start_date);
-        ins_end_event = formatDate(rowData.ins_end_date);
-
-        document.getElementById("idEvent").value = idEvent;
-        document.getElementById("name").value = nameEvent;
-        document.getElementById("start_event").value = start_event;
-        document.getElementById("end_event").value = end_event;
-        document.getElementById("ins_start_event").value = ins_start_event;
-        document.getElementById("ins_end_event").value = ins_end_event;
-
-        document.querySelector(".modal-title").textContent = "Editar Evento";
-        document.getElementById("action").innerHTML =
-          "Editar <i class='far fa-calendar-check'></i>";
-      }
-    });
-
-    document.addEventListener("click", function (e) {
-      if (e.target && e.target.classList.contains("deleteBtn")) {
-        option = 3;
-
-        var row = e.target.closest("tr");
-        var rowData = dataTable.row(row).data();
-        idEvent = parseInt(rowData.id);
-
-        const formDataDelete = new FormData();
-        formDataDelete.append("idEvent", idEvent);
-        formDataDelete.append("option", option);
-
-        var answer = confirm(
-          '¿Está seguro de borrar el evento "' + rowData.name + '"?'
-        );
-
-        if (answer) {
-          sendDataCRUD(formDataDelete, table);
-        }
-      }
-    });
-  });
-
+const createCrudTable = (
+  TABLE,
+  COLUMNS,
+  FORM_NAME,
+  MODAL_NAME,
+  BTN_ID,
+  MODAL_TITLE_ADD,
+  MODAL_TITLE_EDIT,
+  BTN_EDIT,
+  BTN_DELETE,
+  formDataCallback
+) => {
   document
-  .getElementById("users_link")
-  .addEventListener("htmx:afterRequest", async function () {
-    const table = "events";
-    const columns = [
-      { data: "id", visible: false },
-      { data: "name" },
-      { data: "start_date" },
-      { data: "end_date" },
-      { data: "ins_start_date" },
-      { data: "ins_end_date" },
-      {
-        defaultContent:
-          "<div class='text-center'><button class='btn btn-primary btn-sm editBtn' data-bs-toggle='modal' data-bs-target='#modalEvent'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtn'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
-      },
-    ];
-    await initDataTableEvents(table, columns);
+    .getElementById(`${TABLE}_link`)
+    .addEventListener("htmx:afterRequest", async function () {
+      await initDataTable(TABLE, COLUMNS);
 
-    document
-      .getElementById("eventForm")
-      .addEventListener("submit", async (e) => {
-        e.preventDefault(); // Prevent the default form submission behavior (page reload)
+      const form = document.getElementById(FORM_NAME);
+      const submitButton = form.querySelector("#action");
 
-        const form = e.target;
-        const submitButton = form.querySelector("#action"); // Get the submit button
-        submitButton.disabled = true; // Disable the submit button to prevent multiple clicks
-
-        //Hide Modal
-        var myModal = bootstrap.Modal.getOrCreateInstance(
-          document.getElementById("modalEvent")
+      const hideModal = () => {
+        const myModal = bootstrap.Modal.getOrCreateInstance(
+          document.getElementById(MODAL_NAME)
         );
         myModal.hide();
+      };
 
-        // Get form input values
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        hideModal();
+
         const formData = new FormData(form);
         formData.append("option", option);
+        for (const [name, value] of formData.entries()) {
+          console.log(`${name}: ${value}`);
+        }
 
-        sendDataCRUD(formData, table);
+        try {
+          const response = await fetch(`${URL_PATH}/${TABLE}/${TABLE}CRUD`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            dataTable.ajax.reload(null, false);
+          } else {
+            console.error("Error:", response.statusText);
+            alert("No se pudo completar la operación.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("No se pudo completar la operación.");
+        }
+
         submitButton.disabled = false;
       });
 
-    document.getElementById("addEvent").addEventListener("click", function () {
-      option = 1;
-      idEvent = null;
-      document.getElementById("eventForm").reset();
-      document.querySelector(".modal-title").textContent = "Agregar Evento";
-      document.getElementById("action").innerHTML =
-        "Agregar <i class='far fa-calendar-check'></i>";
-    });
+      document.getElementById(BTN_ID).addEventListener("click", function () {
+        document.querySelector(".modal-title").textContent = MODAL_TITLE_ADD;
+        document.getElementById("action").textContent = "Agregar";
 
-    document.addEventListener("click", function (e) {
-      if (e.target && e.target.classList.contains("editBtn")) {
-        option = 2;
-        var row = e.target.closest("tr");
-        var rowData = dataTable.row(row).data();
+        option = 1;
+        idEvent = null;
+        form.reset();
+      });
 
-        const formatDate = (dateString) => {
-          const [day, monthStr, year] = dateString.split(" ");
-          const month = convertMonth(monthStr);
-          return `${year}-${month}-${day}`;
-        };
+      document.addEventListener("click", function (e) {
+        if (e.target && e.target.classList.contains(BTN_EDIT)) {
+          document.querySelector(".modal-title").textContent = MODAL_TITLE_EDIT;
+          document.getElementById("action").innerHTML = "Editar";
 
-        idEvent = parseInt(rowData.id); // Access the "id" value
-        nameEvent = rowData.name;
-        start_event = formatDate(rowData.start_date);
-        end_event = formatDate(rowData.end_date);
-        ins_start_event = formatDate(rowData.ins_start_date);
-        ins_end_event = formatDate(rowData.ins_end_date);
-
-        document.getElementById("idEvent").value = idEvent;
-        document.getElementById("name").value = nameEvent;
-        document.getElementById("start_event").value = start_event;
-        document.getElementById("end_event").value = end_event;
-        document.getElementById("ins_start_event").value = ins_start_event;
-        document.getElementById("ins_end_event").value = ins_end_event;
-
-        document.querySelector(".modal-title").textContent = "Editar Evento";
-        document.getElementById("action").innerHTML =
-          "Editar <i class='far fa-calendar-check'></i>";
-      }
-    });
-
-    document.addEventListener("click", function (e) {
-      if (e.target && e.target.classList.contains("deleteBtn")) {
-        option = 3;
-
-        var row = e.target.closest("tr");
-        var rowData = dataTable.row(row).data();
-        idEvent = parseInt(rowData.id);
-
-        const formDataDelete = new FormData();
-        formDataDelete.append("idEvent", idEvent);
-        formDataDelete.append("option", option);
-
-        var answer = confirm(
-          '¿Está seguro de borrar el evento "' + rowData.name + '"?'
-        );
-
-        if (answer) {
-          sendDataCRUD(formDataDelete, table);
+          option = 2;
+          const row = e.target.closest("tr");
+          const rowData = dataTable.row(row).data();
+          formDataCallback(rowData);
         }
-      }
+      });
+
+      document.addEventListener("click", async function (e) {
+        if (e.target && e.target.classList.contains(BTN_DELETE)) {
+          option = 3;
+
+          const row = e.target.closest("tr");
+          const rowData = dataTable.row(row).data();
+          const id = parseInt(rowData.id);
+
+          if (!rowData.toBeDeleted) {
+            rowData.toBeDeleted = true;
+            const confirmMessage = `¿Está seguro de borrar el evento "${rowData.name}"?`;
+            const answer = confirm(confirmMessage);
+
+            if (answer) {
+              const formDataDelete = new FormData();
+              formDataDelete.append("id", id);
+              formDataDelete.append("option", option);
+
+              try {
+                const response = await fetch(
+                  `${URL_PATH}/${TABLE}/${TABLE}CRUD`,
+                  {
+                    method: "POST",
+                    body: formDataDelete,
+                  }
+                );
+
+                if (response.ok) {
+                  const data = await response.json();
+                  dataTable.ajax.reload(null, false);
+                } else {
+                  console.error("Error:", response.statusText);
+                  alert("No se pudo completar la operación.");
+                }
+              } catch (error) {
+                console.error("Error:", error);
+                alert("No se pudo completar la operación.");
+              }
+            } else {
+              setTimeout(function () {
+                rowData.toBeDeleted = false;
+              }, 500);
+            }
+          }
+        }
+      });
     });
-  });
+};
+
+createCrudTable(
+  "events",
+  [
+    { data: "id", visible: false },
+    { data: "name" },
+    { data: "start_date" },
+    { data: "end_date" },
+    { data: "ins_start_date" },
+    { data: "ins_end_date" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnEvent' data-bs-toggle='modal' data-bs-target='#modalEvent'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnEvent'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "eventForm",
+  "modalEvent",
+  "addEvent",
+  "Agregar Evento",
+  "Editar Evento",
+  "editBtnEvent",
+  "deleteBtnEvent",
+  (rowData) => {
+    const idEvent = parseInt(rowData.id);
+    const nameEvent = rowData.name;
+    const start_event = formatDate(rowData.start_date);
+    const end_event = formatDate(rowData.end_date);
+    const ins_start_event = formatDate(rowData.ins_start_date);
+    const ins_end_event = formatDate(rowData.ins_end_date);
+
+    document.getElementById("id").value = idEvent;
+    document.getElementById("name").value = nameEvent;
+    document.getElementById("start_event").value = start_event;
+    document.getElementById("end_event").value = end_event;
+    document.getElementById("ins_start_event").value = ins_start_event;
+    document.getElementById("ins_end_event").value = ins_end_event;
+  }
+);
+
+createCrudTable(
+  "dependencies",
+  [
+    { data: "id", visible: false },
+    { data: "name" },
+    { data: "category" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnDependency' data-bs-toggle='modal' data-bs-target='#modalDependency'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnDependency'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "dependencyForm",
+  "modalDependency",
+  "addDependency",
+  "Agregar Dependencia",
+  "Editar Depedencia",
+  "editBtnDependency",
+  "deleteBtnDependency",
+  (rowData) => {
+    var id = parseInt(rowData.id);
+    var name = rowData.name;
+    var category = rowData.category;
+
+    document.getElementById("id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("category").value = category;
+  }
+);
+
+createCrudTable(
+  "employees",
+  [
+    { data: "id", visible: false },
+    { data: "id_dependency", visible: false },
+    { data: "no_employee" },
+    { data: "dependency_name" },
+    { data: "name_s" },
+    { data: "father_last_name" },
+    { data: "mother_last_name" },
+    { data: "role_emp" },
+    { data: "is_active", className: "text-center" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnEmployee' data-bs-toggle='modal' data-bs-target='#modalEmployee'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnEmployee'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "employeeForm",
+  "modalEmployee",
+  "addEmployee",
+  "Agregar Usuario",
+  "Editar Usuario",
+  "editBtnEmployee",
+  "deleteBtnEmployee",
+  (rowData) => {
+    console.log(rowData);
+    var id = parseInt(rowData.id);
+    var no_employee = rowData.no_employee;
+    var id_dependency = rowData.id_dependency;
+    var name_s = rowData.name_s;
+    var father_last_name = rowData.father_last_name;
+    var mother_last_name = rowData.mother_last_name;
+    var role_emp = rowData.role_emp;
+    var is_active = rowData.is_active;
+
+    document.getElementById("id").value = id;
+    document.getElementById("no_employee").value = no_employee;
+    document.getElementById("dependency_name").value = id_dependency;
+    document.getElementById("name_s").value = name_s;
+    document.getElementById("father_last_name").value = father_last_name;
+    document.getElementById("mother_last_name").value = mother_last_name;
+    document.getElementById("role_emp").value = role_emp;
+    document.getElementById("is_active").value = formatStatus(is_active);
+  }
+);

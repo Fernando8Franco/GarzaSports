@@ -30,7 +30,7 @@
         <?= $content ?>
 
         <!-- Scripts -->
+        <script> const URL_PATH = "<?= URL_PATH ?>"; </script>
         <script src="<?= URL_PATH ?>/assets/bootstrap-5/js/bootstrap.min.js"></script>
-        <script src="<?= URL_PATH ?>/assets/js/scripts.js"></script>
     </body>
 </html>

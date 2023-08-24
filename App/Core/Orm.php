@@ -1,33 +1,39 @@
 <?php
 
-class Orm {
+class Orm
+{
     protected $table;
     protected $db;
 
-    public function __construct($table, PDO $connection) {
+    public function __construct($table, PDO $connection)
+    {
         $this->table = $table;
         $this->db = $connection;
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         $stm = $this->db->prepare("SELECT * FROM {$this->table}");
         $stm->execute();
         return $stm->fetchAll();
     }
 
-    public function deleteById($id) {
+    public function deleteById($id)
+    {
         $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
         $stm->bindValue(':id', $id);
         $stm->execute();
     }
 
-    public function deleteByName($name) {
+    public function deleteByName($name)
+    {
         $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE name = :name");
         $stm->bindParam(':name', $name, PDO::PARAM_STR);
         $stm->execute();
     }
 
-    public function updateById($id, $data) {
+    public function updateById($id, $data)
+    {
         $sql = "UPDATE {$this->table} SET ";
         foreach ($data as $key => $value) {
             if ($key != "id") {
@@ -38,9 +44,9 @@ class Orm {
         $sql .= " WHERE id = :id ";
         $stm = $this->db->prepare($sql);
 
-        foreach($data as $key => $value) {
+        foreach ($data as $key => $value) {
             if ($key != "id") {
-            $stm->bindValue(":{$key}", $value);
+                $stm->bindValue(":{$key}", $value);
             }
         }
 
@@ -48,7 +54,8 @@ class Orm {
         $stm->execute();
     }
 
-    public function insert($data) {
+    public function insert($data)
+    {
         $sql = "INSERT INTO {$this->table} (";
         foreach ($data as $key => $value) {
             if ($key != "id") {
@@ -73,17 +80,42 @@ class Orm {
         }
         $stm->execute();
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
-    // CONSULTAS EVENTOS
-    public function getAllDates() {
+    // CONSULT EVENTS
+    public function getAllDates()
+    {
         $stm = $this->db->prepare("SELECT id, name, 
         CONVERT(VARCHAR(11), start_date, 106) as start_date, 
         CONVERT(VARCHAR(11), end_date, 106) as end_date, 
         CONVERT(VARCHAR(11), ins_start_date, 106) as ins_start_date, 
         CONVERT(VARCHAR(11), ins_end_date, 106) as ins_end_date FROM {$this->table}");
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT EMPLOYEES
+    public function getAllEmployees()
+    {
+        $stm = $this->db->prepare("SELECT E.id, E.no_employee, E.name_s, E.father_last_name, E.mother_last_name, E.role_emp, E.id_dependency,
+        CASE WHEN E.is_active = 0 THEN '<i class=\"fa-solid fa-xmark\"></i>' WHEN E.is_active = 1 THEN '<i class=\"fa-solid fa-check\"></i>'
+        END AS is_active, D.name AS dependency_name FROM dbo.Employee E JOIN dbo.Dependency D ON E.id_dependency = D.id;");
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT DEPENDENCY
+
+    public function getDependencies() {
+        $stm = $this->db->prepare("SELECT id, name FROM {$this->table}");
         $stm->execute();
         return $stm->fetchAll();
     }

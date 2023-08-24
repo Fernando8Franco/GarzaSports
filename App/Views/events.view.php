@@ -16,7 +16,7 @@
   </div>
 </div>
 <div class="container table-responsive pt-2">
-  <table id="datatable_events" class="table table-bordered table-striped" style="width:100%">
+  <table id="datatable" class="table table-bordered table-striped" style="width:100%">
     <thead>
       <tr>
         <th>id</th>
@@ -43,7 +43,7 @@
       <form id="eventForm" enctype="multipart/form-data">
         <div class="modal-content border-0">
           <div class="modal-body">
-            <input type="hidden" name="idEvent" id="idEvent">
+            <input type="hidden" name="id" id="id">
             <div class="form-floating">
               <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento"
                 required>

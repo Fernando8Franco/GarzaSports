@@ -1,33 +1,49 @@
 :root {
-    --red: #B91116;
-    --orange: #E24622;
-    --orange2: #E8641C;
-    --yellow: #F39200;
-    --darkgrey: #575756;
-    --grey: #9D9D9D;
-    --darkred: #841816;
-    --bs-body-font-family: 'Helvetica', 'Arial', sans-serif;
+  --red: #b91116;
+  --orange: #e24622;
+  --orange2: #e8641c;
+  --yellow: #f39200;
+  --darkgrey: #575756;
+  --grey: #9d9d9d;
+  --darkred: #841816;
+  --bs-body-font-family: "Helvetica", "Arial", sans-serif;
 }
 
-body, html {
-    height: 100%;
-    margin: 0;
-    background: linear-gradient(to bottom right, var(--red), var(--orange), var(--orange2), var(--yellow));
+body,
+html {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(
+    to bottom right,
+    var(--red),
+    var(--orange),
+    var(--orange2),
+    var(--yellow)
+  );
 }
 
 .loginSection {
-    min-height: 95%
+  min-height: 95%;
 }
 
 .indexSection {
-    min-height: 60%
+  min-height: 60%;
 }
 .event_name {
-    font-size: 45px
+  font-size: 45px;
 }
 
-.btn-danger { background-color: var(--red) !important;}
+.btn-danger {
+  background-color: var(--red) !important;
+}
 
-.btn-secondary { background-color: var(--darkgrey) !important;}
+.btn-secondary {
+  background-color: var(--darkgrey) !important;
+}
 
-.bg-info {background-color: var(--grey) !important;}
+.bg-info {
+  background-color: var(--grey) !important;
+}
+.bg-danger {
+  background-color: var(--red) !important;
+}

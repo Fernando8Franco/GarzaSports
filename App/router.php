@@ -25,7 +25,7 @@ class Router {
     }
 
     public function run() {
-        $database = Database::getInstance();
+        $database = new Database();
         $con = $database->getConnection();
         $controller = new $this->controller($con);
         $method = $this->method;

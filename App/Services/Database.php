@@ -2,7 +2,6 @@
 
 class Database {
     private $connection;
-    private static $instance;
 
     public function __construct() {
         try {
@@ -22,13 +21,6 @@ class Database {
             echo "Connection failed: ".$ex->getMessage();
             exit();
         }
-    }
-
-    public static function getInstance() {
-        if (!self::$instance) {
-            self::$instance = new self();
-        }
-        return self::$instance;
     }
     
     public function getConnection() {

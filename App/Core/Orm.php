@@ -82,9 +82,9 @@ class Orm
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT ALL EVENTS
     ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
-    // CONSULT EVENTS
+
     public function getAllDates()
     {
         $stm = $this->db->prepare("SELECT id, name, 
@@ -97,9 +97,29 @@ class Orm
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT SINGLE EVENT
     ////////////////////////////////////////////////////////////////////////////////////
+
+    public function getEvent()
+    {
+        date_default_timezone_set("America/Mexico_City"); // Set your desired time zone
+        $actualDate = date("Y-m-d");
+        $stm = $this->db->prepare("SELECT name, 
+        CONVERT(VARCHAR(11), start_date, 106) as start_date, 
+        CONVERT(VARCHAR(11), end_date, 106) as end_date, 
+        CONVERT(VARCHAR(11), ins_start_date, 106) as ins_start_date, 
+        CONVERT(VARCHAR(11), ins_end_date, 106) as ins_end_date 
+        FROM {$this->table}
+        WHERE CONVERT(DATE, :target_date) BETWEEN start_date AND end_date;");
+        $stm->bindParam(':target_date', $actualDate);
+        $stm->execute();
+        return $stm->fetch();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     // CONSULT EMPLOYEES
+    ////////////////////////////////////////////////////////////////////////////////////
+
     public function getAllEmployees()
     {
         $stm = $this->db->prepare("SELECT E.id, E.no_employee, E.name_s, E.father_last_name, E.mother_last_name, E.role_emp, E.id_dependency,
@@ -110,13 +130,15 @@ class Orm
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
     // CONSULT DEPENDENCY
+    ////////////////////////////////////////////////////////////////////////////////////
 
-    public function getDependencies() {
+    public function getDependencies()
+    {
         $stm = $this->db->prepare("SELECT id, name FROM {$this->table}");
         $stm->execute();
         return $stm->fetchAll();
     }
+
+
 }

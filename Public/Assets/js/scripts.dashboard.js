@@ -34,6 +34,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
   linkColor.forEach((l) => l.addEventListener("click", colorLink));
 
   // Your code to run since DOM is loaded and ready
+  const fetchPromise = fetchEventDates();
+
+  fetchPromise.then((data) => {
+    const start_date = data.start_date;
+    const end_date = data.end_date;
+    const eventName = data.name;
+
+    // Perform DOM updates only once
+    document.getElementById("dates").innerHTML =
+      start_date + " - " + end_date;
+    document.getElementById("eventName").innerHTML = eventName;
+  });
 });
 
 function convertMonth(month) {
@@ -60,49 +72,10 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-const formatStatus = (status) => {
-  if (status == '<i class="fa-solid fa-xmark"></i>') {
-    return 0;
-  } else if (status == '<i class="fa-solid fa-check"></i>') {
-    return 1;
-  }
-};
-
-const dataTableLanguage = {
-  sProcessing: "Procesando...",
-  sLengthMenu: "Mostrar _MENU_ registros",
-  sZeroRecords: "No se encontraron resultados",
-  sEmptyTable: "Ningún dato disponible en esta tabla",
-  sInfo:
-    "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-  sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-  sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-  sSearch: "Buscar:",
-  sInfoThousands: ",",
-  sLoadingRecords: "Cargando...",
-  oPaginate: {
-    sFirst: "Primero",
-    sLast: "Último",
-    sNext: "Siguiente",
-    sPrevious: "Anterior",
-  },
-};
-
-let dataTable;
-let dataTableIsInitialized = false;
-
-////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-//
-// FUNCTION FOR CREATE THE DATATABLE
-//
-////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
 const initDataTable = async (table, columns) => {
   try {
     if (dataTableIsInitialized) {
       dataTable.destroy();
-      dataTableIsInitialized = false;
     }
 
     var option;
@@ -132,16 +105,111 @@ const initDataTable = async (table, columns) => {
   }
 };
 
-// Call this function to reset the DataTable
-const resetDataTable = () => {
-  if (dataTableIsInitialized) {
-    dataTable.destroy();
-    dataTableIsInitialized = false;
+function isBeforeDate(date1, date2) {
+  return new Date(date1) <= new Date(date2);
+}
+
+// Function to validate the form
+function validateForm() {
+  const startEvent = document.getElementById("start_event").value;
+  const endEvent = document.getElementById("end_event").value;
+  const insStartEvent = document.getElementById("ins_start_event").value;
+  const insEndEvent = document.getElementById("ins_end_event").value;
+
+  if (!isBeforeDate(startEvent, endEvent)) {
+    alert(
+      "La fecha de inicio del evento debe ser anterior a la fecha de finalización del evento."
+    );
+    return false;
+  }
+
+  if (!isBeforeDate(insStartEvent, insEndEvent)) {
+    alert(
+      "La fecha de inicio de inscripción debe ser anterior a la fecha de finalización de inscripción."
+    );
+    return false;
+  }
+
+  if (
+    !isBeforeDate(startEvent, insStartEvent) ||
+    !isBeforeDate(insEndEvent, endEvent)
+  ) {
+    alert(
+      "Las fechas de inscripción deben estar dentro del rango de fechas del evento."
+    );
+    return false;
+  }
+
+  return true;
+}
+
+const formatStatus = (status) => {
+  if (status == '<i class="fa-solid fa-xmark"></i>') {
+    return 0;
+  } else if (status == '<i class="fa-solid fa-check"></i>') {
+    return 1;
   }
 };
 
-// Example usage:
-// Call resetDataTable() whenever you want to completely reset the DataTable.
+const dataTableLanguage = {
+  sProcessing: "Procesando...",
+  sLengthMenu: "Mostrar _MENU_ registros",
+  sZeroRecords: "No se encontraron resultados",
+  sEmptyTable: "Ningún dato disponible en esta tabla",
+  sInfo:
+    "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+  sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+  sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+  sSearch: "Buscar:",
+  sInfoThousands: ",",
+  sLoadingRecords: "Cargando...",
+  oPaginate: {
+    sFirst: "Primero",
+    sLast: "Último",
+    sNext: "Siguiente",
+    sPrevious: "Anterior",
+  },
+};
+
+async function fetchEventDates() {
+  const url = `${URL_PATH}/events/eventsDates`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+document
+  .getElementById("dashboard_link")
+  .addEventListener("htmx:beforeOnLoad", () => {
+    const fetchPromise = fetchEventDates();
+
+    fetchPromise.then((data) => {
+      const start_date = data.start_date;
+      const end_date = data.end_date;
+      const eventName = data.name;
+
+      document.getElementById("dates").innerHTML =
+        start_date + " - " + end_date;
+      document.getElementById("eventName").innerHTML = eventName;
+    });
+  });
+
+let dataTable;
+let dataTableIsInitialized = false;
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION FOR CREATE THE DATATABLE
+//
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 const createCrudTable = (
   TABLE,
@@ -157,7 +225,7 @@ const createCrudTable = (
 ) => {
   document
     .getElementById(`${TABLE}_link`)
-    .addEventListener("htmx:afterRequest", async function () {
+    .addEventListener("htmx:afterOnLoad", async function () {
       await initDataTable(TABLE, COLUMNS);
 
       const form = document.getElementById(FORM_NAME);
@@ -172,14 +240,16 @@ const createCrudTable = (
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        if (TABLE == "events" && !validateForm()) {
+          return;
+        }
+
         submitButton.disabled = true;
         hideModal();
 
         const formData = new FormData(form);
         formData.append("option", option);
-        for (const [name, value] of formData.entries()) {
-          console.log(`${name}: ${value}`);
-        }
 
         try {
           const response = await fetch(`${URL_PATH}/${TABLE}/${TABLE}CRUD`, {
@@ -364,7 +434,6 @@ createCrudTable(
   "editBtnEmployee",
   "deleteBtnEmployee",
   (rowData) => {
-    console.log(rowData);
     var id = parseInt(rowData.id);
     var no_employee = rowData.no_employee;
     var id_dependency = rowData.id_dependency;

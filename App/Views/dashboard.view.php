@@ -1,4 +1,4 @@
-<header class="header" id="header" hx-get="<?= URL_PATH ?>/admin/start" hx-trigger="load" hx-target="#targetPHP">
+<header class="header" id="header">
   <div class="header_toggle">
     <i class="fa-solid fa-bars-staggered" id="header-toggle"></i>
   </div>
@@ -16,7 +16,8 @@
         <span class="nav_logo-name">Garza Sports</span>
       </a>
       <div class="nav_list">
-        <a href="" class="nav_link active" hx-get="<?= URL_PATH ?>/admin/start" hx-target="#targetPHP">
+        <a href="" class="nav_link active" hx-get="<?= URL_PATH ?>/admin/start" hx-target="#targetPHP"
+          hx-trigger="click" id="dashboard_link">
           <i class="fa-solid fa-gauge-high nav_icon"></i>
           <span class="nav_name">Inicio</span>
         </a>
@@ -56,7 +57,7 @@
           </a>
         <?php endif; ?>
 
-        <?php if ( $_SESSION['role_emp'] === 'Empleado'): ?>
+        <?php if ($_SESSION['role_emp'] === 'Empleado'): ?>
           <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/sports/dependencies/index" hx-target="#targetPHP"
             hx-trigger="click">
             <i class="fa-solid fa-volleyball nav_icon"></i>
@@ -76,7 +77,7 @@
           </a>
         <?php endif; ?>
 
-        <?php if ( $_SESSION['role_emp'] === 'Visualizador'): ?>
+        <?php if ($_SESSION['role_emp'] === 'Visualizador'): ?>
           <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/records/index" hx-target="#targetPHP" hx-trigger="click">
             <i class="fa-solid fa-file-pen nav_icon"></i>
             <span class="nav_name">Inscripciones</span>
@@ -102,7 +103,8 @@
 <div class="main">
   <main class="content px-3 py-2">
     <div class="container-fluid">
-      <div class="mb-3" id="targetPHP">
+      <div class="mb-3" id="targetPHP" hx-get="<?= URL_PATH ?>/admin/start" hx-trigger="load once"
+        hx-target="#targetPHP">
       </div>
     </div>
   </main>

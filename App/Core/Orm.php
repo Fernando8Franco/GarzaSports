@@ -25,6 +25,16 @@ class Orm
         $stm->execute();
     }
 
+    public function deleteByIdDependency_Sport($id)
+    {
+        $stm = $this->db->prepare("DELETE FROM Dependency_Sport WHERE id_{$this->table} = :id");
+        $stm->bindValue(':id', $id);
+        $stm->execute();
+        $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        $stm->bindValue(':id', $id);
+        $stm->execute();
+    }
+
     public function deleteByName($name)
     {
         $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE name = :name");
@@ -104,7 +114,7 @@ class Orm
     {
         date_default_timezone_set("America/Mexico_City"); // Set your desired time zone
         $actualDate = date("Y-m-d");
-        $stm = $this->db->prepare("SELECT name, 
+        $stm = $this->db->prepare("SELECT id, name, 
         CONVERT(VARCHAR(11), start_date, 106) as start_date, 
         CONVERT(VARCHAR(11), end_date, 106) as end_date, 
         CONVERT(VARCHAR(11), ins_start_date, 106) as ins_start_date, 
@@ -119,7 +129,6 @@ class Orm
     ////////////////////////////////////////////////////////////////////////////////////
     // CONSULT EMPLOYEES
     ////////////////////////////////////////////////////////////////////////////////////
-
     public function getAllEmployees()
     {
         $stm = $this->db->prepare("SELECT E.id, E.no_employee, E.name_s, E.father_last_name, E.mother_last_name, E.role_emp, E.id_dependency,
@@ -132,7 +141,6 @@ class Orm
     ////////////////////////////////////////////////////////////////////////////////////
     // CONSULT DEPENDENCY
     ////////////////////////////////////////////////////////////////////////////////////
-
     public function getDependencies()
     {
         $stm = $this->db->prepare("SELECT id, name FROM {$this->table}");
@@ -140,5 +148,22 @@ class Orm
         return $stm->fetchAll();
     }
 
-
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT TEAM BY DATE
+    ////////////////////////////////////////////////////////////////////////////////////
+    public function getAllTeamsByDate() {
+        date_default_timezone_set("America/Mexico_City"); // Set your desired time zone
+        $actualDate = date("Y-m-d");
+        $stm = $this->db->prepare("SELECT T.id, T.name AS name, CONVERT(VARCHAR(11), T.record_date, 106) AS record_date,
+        D.name AS dependency_name, S.name AS sport_name, E.name AS event_name
+        FROM dbo.Team AS T
+        JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
+        JOIN dbo.Dependency AS D ON DS.id_dependency = D.id
+        JOIN dbo.Sport AS S ON DS.id_sport = S.id
+        JOIN dbo.Event AS E ON T.id_event = E.id
+        WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date AND DS.is_active = 1");
+        $stm->bindParam(':target_date', $actualDate);
+        $stm->execute();
+        return $stm->fetchAll();
+    }
 }

@@ -38,7 +38,7 @@ class DependenciesController extends Controller
                 $dependencies = $this->dependencyModel->getAll();
                 break;
             case 3:
-                $this->dependencyModel->deleteById($data['id']);
+                $this->dependencyModel->deleteByIdDependency_Sport($data['id']);
                 $dependencies = $this->dependencyModel->getAll();
                 break;
             case 4:

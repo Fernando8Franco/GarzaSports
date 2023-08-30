@@ -78,7 +78,7 @@
             </div>
             <div class="row g-2">
               <div class="form-floating col-6">
-                <select class="form-select mb-4" id="role_emp" name="role_emp" aria-label="Default select example"">
+                <select class="form-select mb-4" id="role_emp" name="role_emp" aria-label="Default select example">
                   <option value="Empleado">Empleado</option>
                   <option value="Visualizador">Visualizador</option>
                   <option value="Administrador">Administrador</option>
@@ -86,7 +86,7 @@
                 <label for="role_emp">Rol del empleado</label>
               </div>
               <div class="form-floating col-6">
-                <select class="form-select mb-4" id="is_active" name="is_active" aria-label="Default select example"">
+                <select class="form-select mb-4" id="is_active" name="is_active" aria-label="Default select example">
                   <option value="0">INACTIVO</option>
                   <option value="1">ACTIVO</option>
                 </select>

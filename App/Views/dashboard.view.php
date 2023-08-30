@@ -38,8 +38,8 @@
             <i class="fa-solid fa-landmark nav_icon"></i>
             <span class="nav_name">Dependencias</span>
           </a>
-          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/sports/dependencies/index" hx-target="#targetPHP"
-            hx-trigger="click">
+          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/sports/index" hx-target="#targetPHP"
+            hx-trigger="click" id="sports_link">
             <i class="fa-solid fa-volleyball nav_icon"></i>
             <span class="nav_name">Deportes</span>
           </a>
@@ -47,13 +47,13 @@
             <i class="fa-solid fa-file-pen nav_icon"></i>
             <span class="nav_name">Inscripciones</span>
           </a>
+          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/teams/index" hx-target="#targetPHP" hx-trigger="click" id="teams_link">
+            <i class="fa-solid fa-people-group fa-lg nav_icon"></i>
+            <span class="nav_name">Equipos</span>
+          </a>
           <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/players/index" hx-target="#targetPHP" hx-trigger="click">
             <i class="fa-solid fa-address-book nav_icon"></i>
             <span class="nav_name">Participantes</span>
-          </a>
-          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/teams/index" hx-target="#targetPHP" hx-trigger="click">
-            <i class="fa-solid fa-people-group fa-lg nav_icon"></i>
-            <span class="nav_name">Equipos</span>
           </a>
         <?php endif; ?>
 

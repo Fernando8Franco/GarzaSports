@@ -453,3 +453,82 @@ createCrudTable(
     document.getElementById("is_active").value = formatStatus(is_active);
   }
 );
+
+createCrudTable(
+  "sports",
+  [
+    { data: "id", visible: false },
+    { data: "name"},
+    { data: "type" },
+    { data: "gender" },
+    { data: "num_players" },
+    { data: "num_extraplayers" },
+    { data: "has_captain" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnSport' data-bs-toggle='modal' data-bs-target='#modalSport'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnSport'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "sportForm",
+  "modalSport",
+  "addSport",
+  "Agregar Deporte",
+  "Editar Deporte",
+  "editBtnSport",
+  "deleteBtnSport",
+  (rowData) => {
+    var id = parseInt(rowData.id);
+    var name = rowData.name;
+    var type = rowData.type;
+    var gender = rowData.gender;
+    var num_players = rowData.num_players;
+    var num_extraplayers = rowData.num_extraplayers;
+    var has_captain = rowData.has_captain;
+
+    document.getElementById("id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("type").value = type;
+    document.getElementById("gender").value = gender;
+    document.getElementById("num_players").value = num_players;
+    document.getElementById("num_extraplayers").value = num_extraplayers;
+    document.getElementById("has_captain").value = has_captain;
+  }
+);
+
+createCrudTable(
+  "teams",
+  [
+    { data: "id", visible: false },
+    { data: "name"},
+    { data: "record_date" },
+    { data: "dependency_name" },
+    { data: "sport_name" },
+    { data: "event_name" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnTeam' data-bs-toggle='modal' data-bs-target='#modalTeam'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnTeam'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "teamForm",
+  "modalTeam",
+  "addTeam",
+  " ",
+  "Editar Equipo",
+  "editBtnTeam",
+  "deleteBtnTeam",
+  (rowData) => {
+    var id = parseInt(rowData.id);
+    var name = rowData.name;
+    var record_date = rowData.record_date;
+    var dependency_name = rowData.dependency_name;
+    var sport_name = rowData.sport_name;
+    var event_name = rowData.event_name;
+
+    document.getElementById("id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("record_date").value = record_date;
+    document.getElementById("dependency_name").value = dependency_name;
+    document.getElementById("sport_name").value = sport_name;
+    document.getElementById("event_name").value = event_name;
+  }
+);

@@ -4,7 +4,7 @@
         header("Location: {$url}/admin/");
     }else if(isset($_POST['internal'])){
         $url = URL_PATH;
-        header("Location: {$url}/admin/dashboard");
+        header("Location: {$url}/index/registroUAEH");
     }
 ?>
 

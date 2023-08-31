@@ -52,4 +52,14 @@ class SportsController extends Controller {
         
         echo json_encode($sports, JSON_UNESCAPED_UNICODE);
     }
+
+    public function getSport() {
+        $json_data = file_get_contents('php://input');
+        $data = json_decode($json_data, true);
+        $id = $data['id'] ?? '';
+        
+        $sport = $this->sportModel->getById($id);
+
+        echo json_encode($sport);
+    }
 }

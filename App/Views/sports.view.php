@@ -62,7 +62,7 @@
                 <select class="form-select mb-4" id="gender" name="gender" aria-label="Default select example" required>
                   <option value="" disabled selected>Seleccionar...</option>
                   <option value="Varonil">Varonil</option>
-                  <option value="Femeinil">Femenil</option>
+                  <option value="Femenil">Femenil</option>
                 </select>
                 <label for="gender">Rama</label>
               </div>

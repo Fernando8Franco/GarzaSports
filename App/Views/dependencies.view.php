@@ -47,9 +47,14 @@
               <label for="name">Nombre de la dependencia</label>
             </div>
             <div class="form-floating">
-              <input type="text" class="form-control mb-4" name="category" id="category" placeholder="Categoría"
-                required>
-              <label for="name">Categoría</label>
+              <select class="form-select mb-4" id="category" name="category" aria-label="Default select example" required>
+                <option value="" disabled selected>Seleccionar...</option>
+                <option value="BACHILLERATO">BACHILLERATO</option>
+                <option value="UNIVERSIDAD">UNIVERSIDAD</option>
+                <option value="POSGRADO">POSGRADO</option>
+                <option value="ACÁDEMICO Y ADMINISTRATIVO">ACÁDEMICO Y ADMINISTRATIVO</option>
+              </select>
+              <label for="category">Categoria</label>
             </div>
           </div>
           <div class="modal-footer justify-content-center">

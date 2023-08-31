@@ -18,6 +18,14 @@ class Orm
         return $stm->fetchAll();
     }
 
+    public function getById($id)
+    {
+        $stm = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = :id");
+        $stm->bindValue(':id', $id);
+        $stm->execute();
+        return $stm->fetch();
+    }
+
     public function deleteById($id)
     {
         $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
@@ -144,6 +152,58 @@ class Orm
     public function getDependencies()
     {
         $stm = $this->db->prepare("SELECT id, name FROM {$this->table}");
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT CATEGORIES
+    ////////////////////////////////////////////////////////////////////////////////////
+    public function getCategories()
+    {
+        $stm = $this->db->prepare("SELECT DISTINCT category FROM {$this->table}");
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT DEPENDENCIES BY CATEGORY
+    ////////////////////////////////////////////////////////////////////////////////////
+    public function getDependenciesByCategory($category)
+    {
+        $stm = $this->db->prepare("SELECT id, name FROM {$this->table} WHERE category = :category");
+        $stm->bindParam(':category', $category);
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT BRANCHES
+    ////////////////////////////////////////////////////////////////////////////////////
+    public function getbranches($dependency)
+    {
+        $stm = $this->db->prepare("SELECT DISTINCT S.gender
+        FROM Dependency_Sport DS
+        INNER JOIN Dependency D ON DS.id_dependency = D.id
+        INNER JOIN Sport S ON DS.id_sport = S.id
+        WHERE D.id = :dependency AND DS.is_active = 1");
+        $stm->bindParam(':dependency', $dependency);
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // CONSULT SPORTS BY DEPENDENCY
+    ////////////////////////////////////////////////////////////////////////////////////
+    public function getSportsByDependency($dependency, $gender)
+    {
+        $stm = $this->db->prepare("SELECT S.id AS id, S.name AS name
+        FROM Dependency_Sport DS
+        INNER JOIN Dependency D ON DS.id_dependency = D.id
+        INNER JOIN Sport S ON DS.id_sport = S.id
+        WHERE D.id = :dependency AND DS.is_active = 1 AND S.gender = :gender");
+        $stm->bindParam(':dependency', $dependency);
+        $stm->bindParam(':gender', $gender);
         $stm->execute();
         return $stm->fetchAll();
     }

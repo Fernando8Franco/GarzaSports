@@ -31,6 +31,9 @@
 
         <!-- Scripts -->
         <script> const URL_PATH = "<?= URL_PATH ?>"; </script>
+        <script src="<?= URL_PATH ?>/assets/js/htmx-1.9.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.0/cropper.min.js"></script>
         <script src="<?= URL_PATH ?>/assets/bootstrap-5/js/bootstrap.min.js"></script>
+        <script src="<?= URL_PATH ?>/assets/js/scripts.index.js"></script>
     </body>
 </html>

@@ -37,14 +37,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
   const fetchPromise = fetchEventDates();
 
   fetchPromise.then((data) => {
+    console.log(data);
     const start_date = data.start_date;
     const end_date = data.end_date;
     const eventName = data.name;
+    console.log(data.start_date + " " + end_date + " " + eventName);
 
     // Perform DOM updates only once
-    document.getElementById("dates").innerHTML =
+    document.getElementById("eventName").textContent = eventName;
+    document.getElementById("dates").textContent =
       start_date + " - " + end_date;
-    document.getElementById("eventName").innerHTML = eventName;
   });
 });
 
@@ -194,9 +196,9 @@ document
       const end_date = data.end_date;
       const eventName = data.name;
 
-      document.getElementById("dates").innerHTML =
+      document.getElementById("dates").textContent =
         start_date + " - " + end_date;
-      document.getElementById("eventName").innerHTML = eventName;
+      document.getElementById("eventName").textContent = eventName;
     });
   });
 

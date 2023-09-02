@@ -3,6 +3,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const dependencySelect = document.getElementById("dependency");
   const sportSelect = document.getElementById("sport");
   const branchSelect = document.getElementById("branch");
+  const formContainer = document.getElementById("form-container");
+
+  const fetchPromise = fetchEventDates();
+  let idEvent;
+  fetchPromise.then((data) => {
+    const eventName = data.name;
+
+    document.getElementById("eventName").textContent = "Registro " + eventName;
+  });
 
   function areSelectsSelected() {
     return (
@@ -39,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
           '<option value="" disabled selected>Seleccionar...</option>';
         sportSelect.innerHTML =
           '<option value="" disabled selected>Seleccionar...</option>';
+        formContainer.innerHTML = "";
       })
       .catch((error) => {
         console.error("Error al hacer la solicitud:", error);
@@ -70,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         branchSelect.innerHTML = data;
         sportSelect.innerHTML =
           '<option value="" disabled selected>Seleccionar...</option>';
+        formContainer.innerHTML = "";
       })
       .catch((error) => {
         console.error("Error al hacer la solicitud:", error);
@@ -101,12 +112,12 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.text()) // Parseamos la respuesta JSON
       .then((data) => {
         sportSelect.innerHTML = data;
+        formContainer.innerHTML = "";
       })
       .catch((error) => {
         console.error("Error al hacer la solicitud:", error);
       });
   });
-
 
   sportSelect.addEventListener("change", function () {
     if (areSelectsSelected()) {
@@ -132,6 +143,52 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json()) // Parseamos la respuesta JSON
         .then((data) => {
           generateDynamicForm(data);
+          for (let i = 0; i < data.num_players; i++) {
+            initializeCroppie(
+              `player_photo_${i}`,
+              `player_croppie-container_${i}`,
+              `player_cropp_photo_${i}`,
+              `player_cropImage_${i}`,
+              `player_cropModal_${i}`,
+              `player_binary_${i}`
+            );
+          }
+          for (let i = 0; i < data.num_extraplayers; i++) {
+            initializeCroppie(
+              `extra_player_photo_${i}`,
+              `extra_player_croppie-container_${i}`,
+              `extra_player_cropp_photo_${i}`,
+              `extra_player_cropImage_${i}`,
+              `extra_player_cropModal_${i}`,
+              `extra_player_binary_${i}`
+            );
+          }
+
+          const form = document.getElementById("internForm");
+
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+              const response = await fetch(`${URL_PATH}/register/internRegister`, {
+                method: "POST",
+                body: formData,
+              });
+
+              if (response.ok) {
+                const data = await response.text();
+                console.log(data);
+              } else {
+                console.error("Error:", response.statusText);
+                alert("No se pudo completar la operación.");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("No se pudo completar la operación.");
+            }
+          });
         })
         .catch((error) => {
           console.error("Error al hacer la solicitud:", error);
@@ -141,12 +198,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateDynamicForm(data) {
     const selectedDependency = dependencySelect.value;
+    const selectedSport = sportSelect.value;
     const formContainer = document.getElementById("form-container");
     const numPlayers = data.num_players;
     const numExtraPlayers = data.num_extraplayers;
-    const needCaptain = data.has_captain;
+    const needCaptain = parseInt(data.has_captain);
 
     const form = document.createElement("form");
+    form.id = "internForm";
 
     const formHeader = document.createElement("div");
     formHeader.className = "container";
@@ -167,158 +226,223 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     form.appendChild(teamName);
 
-    // Generar campos para el equipo
-    for (let i = 0; i < numPlayers; i++) {
+    function createPlayerFields(
+      isCaptain,
+      isExtra,
+      playerNum,
+      requiredInput,
+      name
+    ) {
       const playerDiv = document.createElement("div");
-      playerDiv.className = "container py-3";
-      if (i == 0 && needCaptain) {
-        playerDiv.innerHTML = `
-        <h4 class="mb-4"><span class="text-danger">Capitan</span> - Jugador no. ${i + 1}</h4>
+      playerDiv.className = "container py-5 border-top border-bottom border-seconday";
+
+      const captainHTML =
+        isCaptain === 1 ? `<span class="text-danger">Capitan</span> - ` : "";
+
+      playerDiv.innerHTML = `
+        <h4 class="mb-4">${captainHTML}Jugador ${
+        isExtra ? '<span class="text-info">Extra</span> ' : ""
+      }no. ${playerNum + 1}</h4>
         <div class="row g-2">
-          <div class="form-floating col-4">
-            <input type="text" class="form-control mb-3" name="player_name_${i}" placeholder="Nombre(s)" required>
-            <label for="player_name_${i}">Nombre(s)</label>
+          <div class="form-floating col-3">
+            <input type="text" class="form-control mb-3" id="${name}_acc_number_${playerNum}" name="acc_number[]" placeholder="Número de cuenta" ${requiredInput}>
+            <label for="acc_number[]">Número de cuenta</label>
           </div>
-          <div class="form-floating col-4">
-            <input type="text" class="form-control" name="player_father_last_name_${i}" placeholder="Apellido Paterno" required>
-            <label for="player_father_last_name_${i}">Apellido Paterno</label>
+          <div class="form-floating col-3">
+            <input type="text" class="form-control mb-3" id="${name}_name_${playerNum}" name="name[]" placeholder="Nombre(s)" ${requiredInput}>
+            <label for="name[]">Nombre(s)</label>
           </div>
-          <div class="form-floating col-4">
-            <input type="text" class="form-control" name="player_mother_last_name_${i}" placeholder="Apellido Materno" required>
-            <label for="player_mother_last_name_${i}">Apellido Materno</label>
+          <div class="form-floating col-3">
+            <input type="text" class="form-control" id="${name}_father_last_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" ${requiredInput}>
+            <label for="father_last_name[]">Apellido Paterno</label>
+          </div>
+          <div class="form-floating col-3">
+            <input type="text" class="form-control" id="${name}_mother_last_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" ${requiredInput}>
+            <label for="mother_last_name[]">Apellido Materno</label>
           </div>
         </div>
         <div class="row g-2">
-          <div class="form-floating col-4">
-            <input type="date" class="form-control mb-3" name="player_birthday_${i}" required>
-            <label for="player_birthday_${i}">Fecha de nacimiento</label>
+          <div class="form-floating col-4 mb-3">
+            <input type="date" class="form-control id="${name}_birthday_${playerNum}" mb-3" name="birthday[]" ${requiredInput}>
+            <label for="birthday[]">Fecha de nacimiento</label>
           </div>
           <div class="form-floating col-4">
-            <select class="form-select" name="player_gender_${i}" aria-label="Default select example required">
+            <select class="form-select" id="${name}_gender_${playerNum}" name="gender[]" aria-label="Default select example ${requiredInput}">
               <option value="" disabled selected>Seleccionar...</option>
               <option value="Mujer">Mujer</option>
               <option value="Hombre">Hombre</option>
               <option value="Otro">Administrador</option>
             </select>
-            <label for="player_gender_${i}">Sexo</label>
+            <label for="gender[]">Sexo</label>
           </div>
           <div class="form-floating col-4">
-            <input type="tel" class="form-control" name="player_phone_number_${i}" placeholder="Número de Celular" required>
-            <label for="player_phone_number_${i}">Número de Celular</label>
+            <input type="tel" class="form-control" id="${name}_phone_number_${playerNum}" name="phone_number[]" placeholder="Número de Celular" ${requiredInput}>
+            <label for="phone_number[]">Número de Celular</label>
           </div>
         </div>
         
         <div class="row g-2">
           <div class="form-floating col-6 mb-3">
-            <input type="email" class="form-control" name="player_email_${i}" placeholder="Correo Electrónico" required>
-            <label for="player_email_${i}">Correo Electrónico</label>
+            <input type="email" class="form-control" id="${name}_email_${playerNum}" name="email[]" placeholder="Correo Electrónico" ${requiredInput}>
+            <label for="email[]">Correo Electrónico</label>
           </div>
           <div class="form-floating col-3">
-            <input type="number" class="form-control" name="player_semester_${i}" placeholder="Semestre" required>
-            <label for="player_semester_${i}">Semestre</label>
+            <input type="number" class="form-control" id="${name}_semester_${playerNum}" name="semester[]" placeholder="Semestre" ${requiredInput}>
+            <label for="semester[]">Semestre</label>
           </div>
           <div class="form-floating col-3">
-            <input type="number" class="form-control" name="player_${i}" placeholder="Grupo" required>
-            <label for="player_group_${i}">Grupo</label>
+            <input type="number" class="form-control" id="${name}_group_num_${playerNum}" name="group_num[]" placeholder="Grupo" ${requiredInput}>
+            <label for="group_num[]">Grupo</label>
           </div>
         </div>
 
-        <label>Imagen del jugador:</label>
-        <div class="">
-          <input type="file" class="form-control" name="player_image_${i}" accept="image/*" required>
-        </div>
-        
-        <input type="hidden" name="player_captain_${i}" value="1">
-        <input type="hidden" name="player_captain_${i}" value=${selectedDependency}>
-
-        `;
-      } else {
-        playerDiv.innerHTML = `
-        <h4 class="mb-4">Jugador no. ${i + 1}</h4>
-        <div class="row g-2">
-          <div class="form-floating col-4">
-            <input type="text" class="form-control mb-3" name="player_name_${i}" placeholder="Nombre(s)" required>
-            <label for="player_name_${i}">Nombre(s)</label>
+        <div class="row g-2 align-items-center">
+          <div class="col-4 text-center">
+            <img id="${name}_cropp_photo_${playerNum}" src="${URL_PATH}/assets/images/user256px.png" alt="Imagen recortada" style="max-width: 100%; width: 200px; height: 200px;">
           </div>
-          <div class="form-floating col-4">
-            <input type="text" class="form-control" name="player_father_last_name_${i}" placeholder="Apellido Paterno" required>
-            <label for="player_father_last_name_${i}">Apellido Paterno</label>
-          </div>
-          <div class="form-floating col-4">
-            <input type="text" class="form-control" name="player_mother_last_name_${i}" placeholder="Apellido Materno" required>
-            <label for="player_mother_last_name_${i}">Apellido Materno</label>
-          </div>
-        </div>
-        <div class="row g-2">
-          <div class="form-floating col-4">
-            <input type="date" class="form-control mb-3" name="player_birthday_${i}" required>
-            <label for="player_birthday_${i}">Fecha de nacimiento</label>
-          </div>
-          <div class="form-floating col-4">
-            <select class="form-select" name="player_gender_${i}" aria-label="Default select example required">
-              <option value="" disabled selected>Seleccionar...</option>
-              <option value="Mujer">Mujer</option>
-              <option value="Hombre">Hombre</option>
-              <option value="Otro">Administrador</option>
-            </select>
-            <label for="player_gender_${i}">Sexo</label>
-          </div>
-          <div class="form-floating col-4">
-            <input type="tel" class="form-control" name="player_phone_number_${i}" placeholder="Número de Celular" required>
-            <label for="player_phone_number_${i}">Número de Celular</label>
-          </div>
-        </div>
-        
-        <div class="row g-2">
-          <div class="form-floating col-6 mb-3">
-            <input type="email" class="form-control" name="player_email_${i}" placeholder="Correo Electrónico" required>
-            <label for="player_email_${i}">Correo Electrónico</label>
-          </div>
-          <div class="form-floating col-3">
-            <input type="number" class="form-control" name="player_semester_${i}" placeholder="Semestre" required>
-            <label for="player_semester_${i}">Semestre</label>
-          </div>
-          <div class="form-floating col-3">
-            <input type="number" class="form-control" name="player_${i}" placeholder="Grupo" required>
-            <label for="player_group_${i}">Grupo</label>
+          <div class="col-8">
+            <div class="mb-3">
+              <label for="${name}_photo_${playerNum}">Imagen:</label>
+              <input type="file" class="form-control" id="${name}_photo_${playerNum}" name="image" accept="image/*" ${requiredInput}>
+            </div>
           </div>
         </div>
 
-        <label>Imagen del jugador:</label>
-        <div class="">
-          <input type="file" class="form-control" name="player_image_${i}" accept="image/*" required>
+        <div class="modal fade" id="${name}_cropModal_${playerNum}" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="cropModalLabel">Recortar Imagen</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <div id="${name}_croppie-container_${playerNum}"></div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="button" class="btn btn-danger" id="${name}_cropImage_${playerNum}">Recortar</button>
+                  </div>
+              </div>
+          </div>
         </div>
-        
-        <input type="hidden" name="player_captain_${i}" value="0">
-        <input type="hidden" name="player_captain_${i}" value=${selectedDependency}>
 
+        <input type="hidden" name="photo[]" id="${name}_binary_${playerNum}">
+        <input type="hidden" name="is_captain[]" value="${isCaptain}">
+        <input type="hidden" name="id_dependency[]" value="${selectedDependency}">
+        <input type="hidden" name="id_sport[]" value="${selectedSport}">
       `;
-      }
+
       form.appendChild(playerDiv);
     }
 
-    // Generar campos para jugadores extra
-    for (let i = 0; i < numExtraPlayers; i++) {
-      const extraPlayerDiv = document.createElement("div");
-      extraPlayerDiv.className = "player-input";
-      extraPlayerDiv.innerHTML = `
-        <h3>Extra Player ${i + 1}</h3>
-        <input type="text" name="extra_player_name_${i}" placeholder="Name">
-        <input type="date" name="extra_player_birthday_${i}" placeholder="Birthday">
-        <input type="text" name="extra_player_gender_${i}" placeholder="Gender">
-        <!-- Agregar más campos según tus necesidades -->
-      `;
-      form.appendChild(extraPlayerDiv);
+    for (let i = 0; i < numPlayers; i++) {
+      const isCaptain = i === 0 && needCaptain !== 0 ? 1 : 0;
+      createPlayerFields(isCaptain, false, i, "required", "player");
     }
 
-    // Agregar botón de envío
-    const submitButton = document.createElement("button");
-    submitButton.type = "submit";
-    submitButton.textContent = "Submit";
-    form.appendChild(submitButton);
+    for (let i = 0; i < numExtraPlayers; i++) {
+      createPlayerFields(0, true, i, " ", "extra_player");
+    }
+
+    const buttonDiv = document.createElement("div");
+    buttonDiv.className = "container text-center mt-4";
+    buttonDiv.innerHTML = `
+      <button type="submit" name="action" id="action" class="btn btn-danger btn-lg">
+        Enviar
+      </button>
+    `;
+    form.appendChild(buttonDiv);
+
+    const modal = document.createElement("div");
+    modal.innerHTML = ``;
 
     formContainer.innerHTML = "";
+    formContainer.className = "form-container";
     formContainer.appendChild(form);
   }
 });
 
+function initializeCroppie(
+  inputId,
+  containerId,
+  croppedImageId,
+  cropButtonId,
+  modalCrop,
+  binaryDiv
+) {
+  const imageInput = document.getElementById(inputId);
+  const cropModalElement = document.getElementById(modalCrop);
+  const croppieContainer = document.getElementById(containerId);
+  let croppieInstance = null;
+  let cropModal = null; // Declare the variable to hold the modal instance
+
+  imageInput.addEventListener("change", function () {
+    if (imageInput.files && imageInput.files[0]) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        if (croppieInstance) {
+          croppieInstance.destroy();
+        }
+        croppieInstance = new Croppie(croppieContainer, {
+          viewport: { width: 200, height: 200, type: "square" },
+          boundary: { width: 300, height: 300 },
+          showZoomer: true,
+          mouseWheelZoom: "ctrl",
+        });
+
+        function onModalShown() {
+          croppieInstance.bind({
+            url: e.target.result,
+          });
+          cropModalElement.removeEventListener("shown.bs.modal", onModalShown);
+        }
+
+        cropModalElement.addEventListener("shown.bs.modal", onModalShown);
+
+        cropModal = new bootstrap.Modal(cropModalElement);
+        cropModal.show();
+      };
+
+      reader.readAsDataURL(imageInput.files[0]);
+    }
+  });
+
+  document.getElementById(cropButtonId).addEventListener("click", function () {
+    croppieInstance
+      .result("blob", { format: "jpeg", size: { width: 180, height: 180 } })
+      .then(function (blob) {
+        const croppedImage = document.getElementById(croppedImageId);
+        const binary = document.getElementById(binaryDiv);
+
+        // Compress the image before converting it to base64
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+        img.onload = function () {
+          canvas.width = 200; // Set the desired width
+          canvas.height = 200; // Set the desired height
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressedDataURL = canvas.toDataURL("image/jpeg", 0.7); // Adjust quality as needed
+
+          binary.value = compressedDataURL.split(",")[1];
+          croppedImage.src = compressedDataURL;
+          cropModal.hide();
+        };
+      });
+  });
+}
+
+async function fetchEventDates() {
+  const url = `${URL_PATH}/events/eventsDates`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}

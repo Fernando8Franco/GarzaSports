@@ -79,7 +79,7 @@ class EventsController extends Controller
 
   public function eventsDates()
   {
-    if (isset($_SESSION['role_emp'])) {
+    if (/*isset($_SESSION['role_emp')*/true) {
       $events = $this->eventModel->getEvent();
 
       if ($events > 0) {
@@ -92,6 +92,7 @@ class EventsController extends Controller
       } else {
         $events = [
           [
+            "id" => 0,
             "name" => "GarzaSports - Ingresar Evento",
             "start_date" => "Sin definir",
             "end_date" => "Sin definir",

@@ -20,6 +20,9 @@ html {
     var(--orange2),
     var(--yellow)
   );
+  background-size: cover;
+  background-repeat: no-repeat; /* Evita la repetición del fondo */
+  background-attachment: fixed; /* Fija el fondo en su lugar */
 }
 
 .loginSection {
@@ -46,4 +49,7 @@ html {
 }
 .bg-danger {
   background-color: var(--red) !important;
+}
+.border-seconday {
+  border-color: var(--darkgrey) !important;
 }

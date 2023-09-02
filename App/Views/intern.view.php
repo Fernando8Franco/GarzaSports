@@ -1,7 +1,7 @@
 <div class="container my-5 text-center">
   <div class="container bg">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom border-4 border-dark">
-      <span class="fw-bold text-white event_name">REGISTRO NOMBRE EVENTO</span>
+      <span class="fw-bold text-white event_name" id="eventName"> </span>
     </header>
   </div>
 </div>
@@ -37,7 +37,7 @@
     </section>
 
     <section id="form-container">
-      
+
     </section>
   </div>
 </div>

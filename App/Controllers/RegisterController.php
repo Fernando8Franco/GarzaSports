@@ -28,12 +28,12 @@ class RegisterController extends Controller
 
   public function internRegister()
   {
-    $queryPhoto = "SELECT photo FROM Player WHERE id = 24";
+    $queryPhoto = "SELECT photo FROM Player WHERE id = 9";
           $stmPhoto = $this->con->prepare($queryPhoto);
           $stmPhoto->execute();
           $xdphoto = $stmPhoto->fetchColumn();
 
-          echo $xdphoto;
+    echo $xdphoto;
 
     $teamName = $_POST["team_name"] ?? '';
     $dependencyId = $_POST["id_dependency"][0] ?? '';
@@ -80,10 +80,11 @@ class RegisterController extends Controller
         $group_num = $_POST["group_num"][$i] ?? '';
         $photo = $_POST["photo"][$i] ?? '';
         $is_captain = $_POST["is_captain"][$i] ?? '';
+        $photo = mb_convert_encoding($photo, 'UTF-8', 'UCS-2');
 
         if (!empty($acc_number) && !empty($name) && !empty($father_last_name) && !empty($mother_last_name) && !empty($birthday) && !empty($gender) && !empty($phone_number) && !empty($email) && !empty($semester) && !empty($group_num) && !empty($photo)) {
           $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
-                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, CONVERT(varbinary(max), :photo), :is_captain, :id_dependency, :id_team)";
+                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, CONVERT(VARBINARY(max), :photo), :is_captain, :id_dependency, :id_team)";
           $stmtInsertPlayer = $this->con->prepare($sqlInsertPlayer);
           $stmtInsertPlayer->bindValue(':acc_number', $acc_number);
           $stmtInsertPlayer->bindValue(':name_s', $name);
@@ -102,7 +103,7 @@ class RegisterController extends Controller
           $stmtInsertPlayer->execute();
 
         } else {
-          echo "Los datos del jugador " . ($i + 1) . " están incompletos. Omitiendo.<br>";
+          echo "Incomplete";
         }
       }
 

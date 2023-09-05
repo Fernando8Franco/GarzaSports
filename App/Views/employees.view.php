@@ -24,8 +24,8 @@
         <th>Número de Empleado</th>
         <th>Dependencia</th>
         <th>Nombre(s)</th>
-        <th>Apellido Paterno</th>
-        <th>Apellido Materno</th>
+        <th>Apellidos</th>
+        <!-- <th>Apellido Materno</th> -->
         <th>Rol</th>
         <th>Estatus</th>
         <th>Acciones</th>

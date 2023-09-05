@@ -48,7 +48,7 @@ class TeamsController extends Controller
                 $teams = $this->teamModel->getAllTeamsByDate();
                 break;
             case 3:
-                $this->teamModel->deleteByIdDependency_Sport($data['id']);
+                $this->teamModel->deleteByIdTeam($data['id']);
                 $teams = $this->teamModel->getAll();
                 break;
             case 4:

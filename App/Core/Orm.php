@@ -43,6 +43,16 @@ class Orm
         $stm->execute();
     }
 
+    public function deleteByIdTeam($id)
+    {
+        $stm = $this->db->prepare("DELETE FROM Player WHERE id_team = :id_team");
+        $stm->bindParam(':id_team', $id, PDO::PARAM_INT);
+        $stm->execute();
+        $stm = $this->db->prepare("DELETE FROM Team WHERE id = :id");
+        $stm->bindParam(':id', $id, PDO::PARAM_INT);
+        $stm->execute();
+    }
+
     public function deleteByName($name)
     {
         $stm = $this->db->prepare("DELETE FROM {$this->table} WHERE name = :name");
@@ -225,5 +235,30 @@ class Orm
         $stm->bindParam(':target_date', $actualDate);
         $stm->execute();
         return $stm->fetchAll();
+    }
+
+    public function getRegister()
+    {
+        $stm = $this->db->prepare("SELECT P.id AS Player_ID, P.acc_number AS Player_Account_Number, P.name_s AS Player_Name,
+        P.father_last_name AS Player_Father_Last_Name, P.mother_last_name AS Player_Mother_Last_Name, P.birthday AS Player_Birthday,
+        CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
+        P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
+        CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
+        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
+        INNER JOIN dbo.Team AS T ON P.id_team = T.id
+        INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
+        INNER JOIN dbo.Dependency AS D ON DS.id_dependency = D.id
+        INNER JOIN dbo.Sport AS S ON DS.id_sport = S.id; ");
+        $stm->execute();
+        return $stm->fetchAll();
+    }
+
+    public function getCount($tableName1, $tableName2) {
+        $stm = $this->db->prepare("SELECT
+        (SELECT COUNT(*) FROM $tableName1) AS rows_$tableName1,
+        (SELECT COUNT(*) FROM $tableName2) AS rows_$tableName2");
+        $stm->execute();
+        return $stm->fetch();
     }
 }

@@ -32,22 +32,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   linkColor.forEach((l) => l.addEventListener("click", colorLink));
-
-  // Your code to run since DOM is loaded and ready
-  const fetchPromise = fetchEventDates();
-
-  fetchPromise.then((data) => {
-    console.log(data);
-    const start_date = data.start_date;
-    const end_date = data.end_date;
-    const eventName = data.name;
-    console.log(data.start_date + " " + end_date + " " + eventName);
-
-    // Perform DOM updates only once
-    document.getElementById("eventName").textContent = eventName;
-    document.getElementById("dates").textContent =
-      start_date + " - " + end_date;
-  });
 });
 
 function convertMonth(month) {
@@ -74,6 +58,51 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
+const dataTableConfig = {
+  dom: "lBfrtip",
+  buttons: [
+    {
+      extend: "print",
+      className: "btn btn-danger text-white",
+      text: "<i class='fa-solid fa-print'></i> Imprimir",
+      title: "Registros",
+      exportOptions: {
+        stripHtml: false,
+        columns: [1, 2, 3, 4, 5],
+      },
+      customize: function (win) {
+        var table = $(win.document.body)
+          .find("table")
+          .addClass("display")
+          .css("font-size", "10px");
+
+        // Asegúrate de que los estilos de ancho de columna se apliquen en todas las páginas.
+        table.find("tr").find("td:eq(0)").css("width", "75px");
+        table.find("tr").find("td:eq(1)").css("width", "50px");
+        table.find("tr").find("td:eq(2)").css("width", "80px");
+        table.find("tr").find("td:eq(4)").css("width", "20px");
+
+        var rows = table.find("tbody tr");
+        var firstPage = true;
+        var registerLength = 8;
+
+        // Divide las filas en grupos de 8 y agrega un salto de página después de cada grupo.
+        for (var i = registerLength; i < rows.length; i += registerLength) {
+          rows
+            .eq(i)
+            .before(
+              '<tr class="paginate_break"><td colspan="5">&nbsp;</td></tr>'
+            );
+          if (firstPage) {
+            registerLength = 9;
+            firstPage = false;
+          }
+        }
+      },
+    },
+  ],
+};
+
 const initDataTable = async (table, columns) => {
   try {
     if (dataTableIsInitialized) {
@@ -83,23 +112,53 @@ const initDataTable = async (table, columns) => {
     var option;
     option = 4;
 
-    dataTable = new DataTable("#datatable", {
-      ajax: {
-        url: URL_PATH + "/" + table + "/" + table + "CRUD",
-        method: "POST",
-        data: { option: option },
-        dataSrc: "",
-      },
-      columns: columns,
-      order: [[0, "desc"]],
-      columnDefs: [
-        {
-          targets: 1, // Target the "name" column (index 1)
-          orderData: [0], // Use data from the "id" column (index 0) for ordering
+    if (table != "register") {
+      dataTable = new DataTable("#datatable", {
+        ajax: {
+          url: URL_PATH + "/" + table + "/" + table + "CRUD",
+          method: "POST",
+          data: { option: option },
+          dataSrc: "",
         },
-      ],
-      language: dataTableLanguage,
-    });
+        columns: columns,
+        order: [[0, "desc"]],
+        columnDefs: [
+          {
+            targets: 1, // Target the "name" column (index 1)
+            orderData: [0], // Use data from the "id" column (index 0) for ordering
+          },
+        ],
+        language: dataTableLanguage,
+        lengthMenu: [
+          [10, 25, 50, 250, -1],
+          [10, 25, 50, 250, "Todos"],
+        ],
+      });
+    } else {
+      dataTable = new DataTable("#datatable", {
+        ...dataTableConfig,
+        paging: false,
+        ajax: {
+          url: URL_PATH + "/" + table + "/" + table + "CRUD",
+          method: "POST",
+          data: { option: option },
+          dataSrc: "",
+        },
+        columns: columns,
+        order: [[0, "asc"]],
+        columnDefs: [
+          {
+            targets: 1, // Target the "name" column (index 1)
+            orderData: [0], // Use data from the "id" column (index 0) for ordering
+          },
+          { width: "100px", targets: 1 },
+          { width: "150px", targets: 2 },
+          { width: "100px", targets: 3 },
+        ],
+        language: dataTableLanguage,
+        lengthMenu: [[-1], ["Todos"]],
+      });
+    }
 
     dataTableIsInitialized = true;
   } catch (error) {
@@ -186,19 +245,56 @@ async function fetchEventDates() {
     });
 }
 
+async function fetchRegisters() {
+  const url = `${URL_PATH}/register/registersData`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
 document
   .getElementById("dashboard_link")
   .addEventListener("htmx:beforeOnLoad", () => {
-    const fetchPromise = fetchEventDates();
+    const fetchPromiseEvent = fetchEventDates();
+    const fetchPromiseRegisters = fetchRegisters();
 
-    fetchPromise.then((data) => {
+    fetchPromiseEvent.then((data) => {
+      document.getElementById("eventName").textContent = data.name;
+      document.getElementById("dates").textContent =
+        data.start_date + " - " + data.end_date;
+    });
+    fetchPromiseRegisters.then((data) => {
+      document.getElementById("registers").textContent = data.rows_team;
+      document.getElementById("num_players").textContent = data.rows_player;
+      document.getElementById("num_teams").textContent = data.rows_team;
+    });
+  });
+
+document
+  .getElementById("targetPHP")
+  .addEventListener("htmx:beforeOnLoad", () => {
+    const fetchPromiseEvent = fetchEventDates();
+    const fetchPromiseRegisters = fetchRegisters();
+
+    fetchPromiseEvent.then((data) => {
       const start_date = data.start_date;
       const end_date = data.end_date;
       const eventName = data.name;
 
+      document.getElementById("eventName").textContent = eventName;
       document.getElementById("dates").textContent =
         start_date + " - " + end_date;
-      document.getElementById("eventName").textContent = eventName;
+    });
+    fetchPromiseRegisters.then((data) => {
+      document.getElementById("registers").textContent = data.rows_team;
+      document.getElementById("num_players").textContent = data.rows_player;
+      document.getElementById("num_teams").textContent = data.rows_team;
     });
   });
 
@@ -419,8 +515,13 @@ createCrudTable(
     { data: "no_employee" },
     { data: "dependency_name" },
     { data: "name_s" },
-    { data: "father_last_name" },
-    { data: "mother_last_name" },
+    {
+      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      render: function (data, type, full, meta) {
+        // Combina los valores de father_last_name y mother_last_name
+        return full.father_last_name + " " + full.mother_last_name;
+      },
+    },
     { data: "role_emp" },
     { data: "is_active", className: "text-center" },
     {
@@ -460,7 +561,7 @@ createCrudTable(
   "sports",
   [
     { data: "id", visible: false },
-    { data: "name"},
+    { data: "name" },
     { data: "type" },
     { data: "gender" },
     { data: "num_players" },
@@ -501,7 +602,7 @@ createCrudTable(
   "teams",
   [
     { data: "id", visible: false },
-    { data: "name"},
+    { data: "name" },
     { data: "record_date" },
     { data: "dependency_name" },
     { data: "sport_name" },
@@ -533,4 +634,82 @@ createCrudTable(
     document.getElementById("sport_name").value = sport_name;
     document.getElementById("event_name").value = event_name;
   }
+);
+
+createCrudTable(
+  "register",
+  [
+    { data: "Player_ID", visible: false },
+    {
+      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      render: function (data, type, full, meta) {
+        // Combina los valores de father_last_name y mother_last_name
+        return full.Team_Name + "<br>" + full.Record_Date;
+      },
+    },
+    { data: "Dependency_Name" },
+    {
+      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      render: function (data, type, full, meta) {
+        // Combina los valores de father_last_name y mother_last_name
+        return full.Sport_Name + "<br>" + "Rama: " + full.Sport_Gender;
+      },
+    },
+    {
+      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      render: function (data, type, full, meta) {
+        // Combina los valores de father_last_name y mother_last_name
+        return (
+          "No. cuenta: " +
+          full.Player_Account_Number +
+          " &nbsp&nbsp Semestre y Grupo: " +
+          full.Player_Semester +
+          " - " +
+          full.Player_Group_Number +
+          "<br>" +
+          "Apellido paterno: " +
+          full.Player_Father_Last_Name +
+          "<br>" +
+          "Apellido materno: " +
+          full.Player_Mother_Last_Name +
+          "<br>" +
+          "Nombre: " +
+          full.Player_Name +
+          "<br>" +
+          "Edad: " +
+          full.Player_Birthday +
+          " &nbsp&nbsp " +
+          "Sexo: " +
+          full.Player_Gender +
+          " &nbsp&nbsp " +
+          "Rol: " +
+          full.Player_Is_Captain +
+          "<br>" +
+          "Número: " +
+          full.Player_Phone_Number +
+          "<br>" +
+          "Correo: " +
+          full.Player_Email
+        );
+      },
+    },
+    {
+      data: null,
+      render: function (data, type, full, meta) {
+        return (
+          '<img src="data:image/png;base64,' +
+          full.Player_Photo +
+          '" alt="Player Photo" class="mx-auto d-block" width="75" height="75"/>'
+        );
+      },
+    },
+  ],
+  "registerForm",
+  "modalRegister",
+  "addRegister",
+  " ",
+  " ",
+  "editRegister",
+  "deleteRegister",
+  (rowData) => {}
 );

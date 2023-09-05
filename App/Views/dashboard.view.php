@@ -43,7 +43,7 @@
             <i class="fa-solid fa-volleyball nav_icon"></i>
             <span class="nav_name">Deportes</span>
           </a>
-          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/records/index" hx-target="#targetPHP" hx-trigger="click">
+          <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/register/index" hx-target="#targetPHP" hx-trigger="click" id="register_link">
             <i class="fa-solid fa-file-pen nav_icon"></i>
             <span class="nav_name">Inscripciones</span>
           </a>

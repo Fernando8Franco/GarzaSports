@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const formContainer = document.getElementById("form-container");
 
   const fetchPromise = fetchEventDates();
-  let idEvent;
   fetchPromise.then((data) => {
     const eventName = data.name;
 
@@ -143,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((response) => response.json()) // Parseamos la respuesta JSON
         .then((data) => {
           generateDynamicForm(data);
+
           for (let i = 0; i < data.num_players; i++) {
             initializeCroppie(
               `player_photo_${i}`,
@@ -162,6 +162,49 @@ document.addEventListener("DOMContentLoaded", function () {
               `extra_player_cropModal_${i}`,
               `extra_player_binary_${i}`
             );
+            const accNumberInput = document.getElementById(
+              `extra_player_acc_number_${i}`
+            );
+            const nameInput = document.getElementById(`extra_player_name_${i}`);
+            const fatherLastNameInput = document.getElementById(
+              `extra_player_father_last_name_${i}`
+            );
+            const motherLastNameInput = document.getElementById(
+              `extra_player_mother_last_name_${i}`
+            );
+            const birthdayInput = document.getElementById(
+              `extra_player_birthday_${i}`
+            );
+            const genderInput = document.getElementById(
+              `extra_player_gender_${i}`
+            );
+            const phoneNumberInput = document.getElementById(
+              `extra_player_phone_number_${i}`
+            );
+            const emailInput = document.getElementById(
+              `extra_player_email_${i}`
+            );
+            const semesterInput = document.getElementById(
+              `extra_player_semester_${i}`
+            );
+            const groupInput = document.getElementById(
+              `extra_player_group_num_${i}`
+            );
+            const photoInput = document.getElementById(
+              `extra_player_photo_${i}`
+            );
+
+            accNumberInput.addEventListener("input", toggleRequired);
+            nameInput.addEventListener("input", toggleRequired);
+            fatherLastNameInput.addEventListener("input", toggleRequired);
+            motherLastNameInput.addEventListener("input", toggleRequired);
+            birthdayInput.addEventListener("input", toggleRequired);
+            genderInput.addEventListener("change", toggleRequired);
+            phoneNumberInput.addEventListener("input", toggleRequired);
+            emailInput.addEventListener("input", toggleRequired);
+            semesterInput.addEventListener("input", toggleRequired);
+            groupInput.addEventListener("input", toggleRequired);
+            photoInput.addEventListener("input", toggleRequired);
           }
 
           const form = document.getElementById("internForm");
@@ -172,10 +215,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const formData = new FormData(form);
 
             try {
-              const response = await fetch(`${URL_PATH}/register/internRegister`, {
-                method: "POST",
-                body: formData,
-              });
+              const response = await fetch(
+                `${URL_PATH}/register/internRegister`,
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
 
               if (response.ok) {
                 const data = await response.text();
@@ -234,7 +280,8 @@ document.addEventListener("DOMContentLoaded", function () {
       name
     ) {
       const playerDiv = document.createElement("div");
-      playerDiv.className = "container py-5 border-top border-bottom border-seconday";
+      playerDiv.className =
+        "container py-5 border-top border-bottom border-seconday";
 
       const captainHTML =
         isCaptain === 1 ? `<span class="text-danger">Capitan</span> - ` : "";
@@ -253,17 +300,17 @@ document.addEventListener("DOMContentLoaded", function () {
             <label for="name[]">Nombre(s)</label>
           </div>
           <div class="form-floating col-3">
-            <input type="text" class="form-control" id="${name}_father_last_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" ${requiredInput}>
+            <input type="text" class="form-control" id="${name}_father_last_name_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" ${requiredInput}>
             <label for="father_last_name[]">Apellido Paterno</label>
           </div>
           <div class="form-floating col-3">
-            <input type="text" class="form-control" id="${name}_mother_last_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" ${requiredInput}>
+            <input type="text" class="form-control" id="${name}_mother_last_name_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" ${requiredInput}>
             <label for="mother_last_name[]">Apellido Materno</label>
           </div>
         </div>
         <div class="row g-2">
           <div class="form-floating col-4 mb-3">
-            <input type="date" class="form-control id="${name}_birthday_${playerNum}" mb-3" name="birthday[]" ${requiredInput}>
+            <input type="date" class="form-control" id="${name}_birthday_${playerNum}" name="birthday[]" placeholder="Fecha de nacimiento" ${requiredInput}>
             <label for="birthday[]">Fecha de nacimiento</label>
           </div>
           <div class="form-floating col-4">
@@ -303,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <div class="col-8">
             <div class="mb-3">
               <label for="${name}_photo_${playerNum}">Imagen:</label>
-              <input type="file" class="form-control" id="${name}_photo_${playerNum}" name="image" accept="image/*" ${requiredInput}>
+              <input type="file" class="form-control" id="${name}_photo_${playerNum}" name="image" accept=".jpg, .jpeg, .png" ${requiredInput}>
             </div>
           </div>
         </div>
@@ -445,4 +492,77 @@ async function fetchEventDates() {
     .catch((error) => {
       console.error("Error:", error);
     });
+}
+
+function toggleRequired(event) {
+  const inputField = event.target;
+  const playerNum = inputField.id.split("_").slice(-1)[0];
+
+  const accNumberInput = document.getElementById(
+    `extra_player_acc_number_${playerNum}`
+  );
+  const nameInput = document.getElementById(`extra_player_name_${playerNum}`);
+  const fatherLastNameInput = document.getElementById(
+    `extra_player_father_last_name_${playerNum}`
+  );
+  const motherLastNameInput = document.getElementById(
+    `extra_player_mother_last_name_${playerNum}`
+  );
+  const birthdayInput = document.getElementById(
+    `extra_player_birthday_${playerNum}`
+  );
+  const genderInput = document.getElementById(
+    `extra_player_gender_${playerNum}`
+  );
+  const phoneNumberInput = document.getElementById(
+    `extra_player_phone_number_${playerNum}`
+  );
+  const emailInput = document.getElementById(`extra_player_email_${playerNum}`);
+  const semesterInput = document.getElementById(
+    `extra_player_semester_${playerNum}`
+  );
+  const groupInput = document.getElementById(
+    `extra_player_group_num_${playerNum}`
+  );
+  const photoInput = document.getElementById(`extra_player_photo_${playerNum}`);
+
+  // Verificar si al menos un campo extra_players está lleno
+  const isAnyFieldFilled =
+    accNumberInput.value.trim() !== "" ||
+    nameInput.value.trim() !== "" ||
+    fatherLastNameInput.value.trim() !== "" ||
+    motherLastNameInput.value.trim() !== "" ||
+    birthdayInput.value.trim() !== "" ||
+    genderInput.value.trim() !== "" ||
+    phoneNumberInput.value.trim() !== "" ||
+    emailInput.value.trim() !== "" ||
+    semesterInput.value.trim() !== "" ||
+    groupInput.value.trim() !== "" ||
+    photoInput.value.trim() !== "";
+
+  if (isAnyFieldFilled) {
+    accNumberInput.required = true;
+    nameInput.required = true;
+    fatherLastNameInput.required = true;
+    motherLastNameInput.required = true;
+    birthdayInput.required = true;
+    genderInput.required = true;
+    phoneNumberInput.required = true;
+    emailInput.required = true;
+    semesterInput.required = true;
+    groupInput.required = true;
+    photoInput.required = true;
+  } else {
+    accNumberInput.required = false;
+    nameInput.required = false;
+    fatherLastNameInput.required = false;
+    motherLastNameInput.required = false;
+    birthdayInput.required = false;
+    genderInput.required = false;
+    phoneNumberInput.required = false;
+    emailInput.required = false;
+    semesterInput.required = false;
+    groupInput.required = false;
+    photoInput.required = false;
+  }
 }

@@ -28,7 +28,7 @@
         <div class="m-auto text-center fw-bold txt_start">
           Número de Inscripciónes:
           <br>
-          8
+          <span id="registers"></span>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="m-auto text-center fw-bold txt_start">
           Número de Participantes:
           <br>
-          9
+          <span id="num_players"></span>
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@
         <div class="m-auto text-center fw-bold txt_start">
           Número de Equipos:
           <br>
-          7
+          <span id="num_teams"></span>
         </div>
       </div>
     </div>

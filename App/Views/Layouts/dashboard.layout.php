@@ -21,6 +21,7 @@ if (!isset($_SESSION['name_s'])) {
   <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/solid.css">
   <link rel="stylesheet"
     href="<?= URL_PATH ?>/assets/datatables/css/cdn.datatables.net_1.13.6_css_dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="<?= URL_PATH ?>/assets/datatables/css/cdn.datatables.net_buttons_2.4.1_css_buttons.dataTables.min.css">
 
   <title>Panel de Control</title>
 </head>
@@ -34,6 +35,8 @@ if (!isset($_SESSION['name_s'])) {
   <script src="<?= URL_PATH ?>/assets/datatables/js/code.jquery.com_jquery-3.7.0.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_jquery.dataTables.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_dataTables.bootstrap5.min.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_dataTables.buttons.min.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_buttons.print.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/js/scripts.dashboard.js"></script>
 </body>
 

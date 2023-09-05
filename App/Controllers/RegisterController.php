@@ -1,10 +1,11 @@
 <?php
 
-require_once(__DIR__ . '/../models/register.php');
+require_once(__DIR__ . '/../models/Team.php');
 
 class RegisterController extends Controller
 {
   private $con;
+  private $teamModel;
   private $spanishMonthNames = [
     'Jan' => 'Ene',
     'Feb' => 'Feb',
@@ -24,17 +25,53 @@ class RegisterController extends Controller
   {
     parent::__construct($con);
     $this->con = $con;
+    $this->teamModel = new Team($con);
+  }
+
+  public function index()
+  {
+    if ($_SESSION['role_emp'] == 'Administrador') {
+      $this->renderView('register');
+    }
+  }
+
+  public function registerCRUD()
+  {
+
+    $data = [
+      'id' => $_POST['id'] ?? '',
+      'no_employee' => $_POST['no_employee'] ?? '',
+      'id_dependency' => $_POST['id_dependency'] ?? '',
+      'name_s' => $_POST['name_s'] ?? '',
+      'father_last_name' => $_POST['father_last_name'] ?? '',
+      'mother_last_name' => $_POST['mother_last_name'] ?? '',
+      'role_emp' => $_POST['role_emp'] ?? '',
+      'is_active' => $_POST['is_active'] ?? ''
+    ];
+
+    $option = $_POST['option'] ?? '';
+
+    switch ($option) {
+      case 4:
+        $registers = $this->teamModel->getRegister();
+        break;
+    }
+
+    foreach ($registers as &$register) {
+      $register['Player_Birthday'] = $this->calculateAge($register['Player_Birthday']);
+      $register['Record_Date'] = strtr($register['Record_Date'], $this->spanishMonthNames);
+    }
+
+    echo json_encode($registers, JSON_UNESCAPED_UNICODE);
+  }
+
+  public function registersData() {
+    $registerData = $this->teamModel->getCount('team', 'player');
+    echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
   }
 
   public function internRegister()
   {
-    $queryPhoto = "SELECT photo FROM Player WHERE id = 9";
-          $stmPhoto = $this->con->prepare($queryPhoto);
-          $stmPhoto->execute();
-          $xdphoto = $stmPhoto->fetchColumn();
-
-    echo $xdphoto;
-
     $teamName = $_POST["team_name"] ?? '';
     $dependencyId = $_POST["id_dependency"][0] ?? '';
     $sportId = $_POST["id_sport"][0] ?? '';
@@ -80,11 +117,10 @@ class RegisterController extends Controller
         $group_num = $_POST["group_num"][$i] ?? '';
         $photo = $_POST["photo"][$i] ?? '';
         $is_captain = $_POST["is_captain"][$i] ?? '';
-        $photo = mb_convert_encoding($photo, 'UTF-8', 'UCS-2');
 
         if (!empty($acc_number) && !empty($name) && !empty($father_last_name) && !empty($mother_last_name) && !empty($birthday) && !empty($gender) && !empty($phone_number) && !empty($email) && !empty($semester) && !empty($group_num) && !empty($photo)) {
           $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
-                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, CONVERT(VARBINARY(max), :photo), :is_captain, :id_dependency, :id_team)";
+                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, :photo, :is_captain, :id_dependency, :id_team)";
           $stmtInsertPlayer = $this->con->prepare($sqlInsertPlayer);
           $stmtInsertPlayer->bindValue(':acc_number', $acc_number);
           $stmtInsertPlayer->bindValue(':name_s', $name);
@@ -101,9 +137,6 @@ class RegisterController extends Controller
           $stmtInsertPlayer->bindValue(':id_dependency', $dependencyId);
           $stmtInsertPlayer->bindValue(':id_team', $id_team);
           $stmtInsertPlayer->execute();
-
-        } else {
-          echo "Incomplete";
         }
       }
 
@@ -113,5 +146,12 @@ class RegisterController extends Controller
       $this->con->rollback();
       echo "Error: " . $e->getMessage();
     }
+  }
+  private function calculateAge($birthday)
+  {
+    $currentDate = new DateTime('now', new DateTimeZone('America/Mexico_City'));
+    $birthdate = new DateTime($birthday, new DateTimeZone('America/Mexico_City'));
+    $ageInterval = $birthdate->diff($currentDate);
+    return $ageInterval->y;
   }
 }

@@ -1,7 +1,5 @@
-# Utilizamos una imagen oficial de PHP con Apache como base
 FROM php:8.0-apache
 
-# Instalamos las dependencias necesarias para la conexión con SQL Server
 RUN apt-get update && apt-get install -y --no-install-recommends \
         apt-transport-https \
         curl \
@@ -17,14 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-enable sqlsrv \
     && docker-php-ext-enable pdo_sqlsrv
 
-# Habilita el módulo de Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Copiamos los archivos del sitio web a la carpeta del servidor de Apache
 COPY ./ /var/www/html
 
-# Reinicia el servidor Apache para aplicar los cambios
 RUN service apache2 restart
 
-# Exponemos el puerto 80 para acceder al servidor web
 EXPOSE 80

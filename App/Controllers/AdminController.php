@@ -32,15 +32,14 @@ class AdminController extends Controller
         $no_employee = $_POST['no_employee'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        $query = "SELECT E.name_s, E.role_emp, E.id_dependency, D.name AS name_dependency FROM dbo.Employee AS E 
+        $query = "SELECT E.name_s, E.role_emp, E.id_dependency, E.password, D.name AS name_dependency FROM dbo.Employee AS E 
                     INNER JOIN dbo.Dependency AS D ON E.id_dependency = D.id WHERE E.no_employee = :no_employee AND E.is_active = 1";
         $stm = $this->con->prepare($query);
         $stm->bindValue(":no_employee", $no_employee);
         $stm->execute();
-
         $result = $stm->fetch();
 
-        if ($result !== false) {
+        if ($result !== false && password_verify($password, $result['password'])) {
             $_SESSION['name_s'] = $result['name_s'];
             $_SESSION['role_emp'] = $result['role_emp'];
             $_SESSION['id_dependency'] = $result['id_dependency'];

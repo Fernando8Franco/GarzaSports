@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const categorySelect = document.getElementById("category");
+  function areSelectsSelected() {
+    return (
+      dependencySelect.value !== "" &&
+      sportSelect.value !== "" &&
+      branchSelect.value != ""
+    );
+  }
   const dependencySelect = document.getElementById("dependency");
   const sportSelect = document.getElementById("sport");
   const branchSelect = document.getElementById("branch");
@@ -12,47 +18,16 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("eventName").textContent = "Registro " + eventName;
   });
 
-  function areSelectsSelected() {
-    return (
-      categorySelect.value !== "" &&
-      dependencySelect.value !== "" &&
-      sportSelect.value !== "" &&
-      branchSelect.value != ""
-    );
-  }
-
-  categorySelect.addEventListener("change", function () {
-    const selectedCategory = categorySelect.value;
-
-    const dataToSend = {
-      category: selectedCategory,
-    };
-
-    const apiUrl = `${URL_PATH}/dependencies/getDependenciesByCategory`;
-
-    // Configuración de la solicitud
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json", // Indicamos que estamos enviando JSON en el cuerpo
-      },
-      body: JSON.stringify(dataToSend), // Convertimos los datos a JSON y los enviamos en el cuerpo
-    };
-
-    fetch(apiUrl, requestOptions)
-      .then((response) => response.text()) // Parseamos la respuesta JSON
-      .then((data) => {
-        dependencySelect.innerHTML = data;
-        branchSelect.innerHTML =
-          '<option value="" disabled selected>Seleccionar...</option>';
-        sportSelect.innerHTML =
-          '<option value="" disabled selected>Seleccionar...</option>';
-        formContainer.innerHTML = "";
-      })
-      .catch((error) => {
-        console.error("Error al hacer la solicitud:", error);
-      });
+  const fetchPromiseGetDependencies = fetchGetDependencies();
+  fetchPromiseGetDependencies.then((data) => {
+    dependencySelect.innerHTML = data;
+         branchSelect.innerHTML =
+           '<option value="" disabled selected>Seleccionar...</option>';
+         sportSelect.innerHTML =
+           '<option value="" disabled selected>Seleccionar...</option>';
+         formContainer.innerHTML = "";
   });
+
 
   dependencySelect.addEventListener("change", function () {
     const selectedDependency = dependencySelect.value;
@@ -266,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
     teamName.className = "container";
     teamName.innerHTML = `
         <div class="form-floating">
-          <input type="text" class="form-control mt-5 mb-3" name="team_name" id="team_name" placeholder="Nombre del Equipo" required>
+          <input type="text" class="form-control mt-5 mb-3" name="team_name" id="team_name" placeholder="Nombre del Equipo" maxlength="80" required>
           <label for="team_name">Nombre del Equipo</label>
         </div>
     `;
@@ -292,19 +267,19 @@ document.addEventListener("DOMContentLoaded", function () {
       }no. ${playerNum + 1}</h4>
         <div class="row g-2">
           <div class="form-floating col-3">
-            <input type="text" class="form-control mb-3" id="${name}_acc_number_${playerNum}" name="acc_number[]" placeholder="Número de cuenta" ${requiredInput}>
+            <input type="text" class="form-control mb-3" id="${name}_acc_number_${playerNum}" name="acc_number[]" placeholder="Número de cuenta" maxlength="10" ${requiredInput}>
             <label for="acc_number[]">Número de cuenta</label>
           </div>
           <div class="form-floating col-3">
-            <input type="text" class="form-control mb-3" id="${name}_name_${playerNum}" name="name[]" placeholder="Nombre(s)" ${requiredInput}>
+            <input type="text" class="form-control mb-3" id="${name}_name_${playerNum}" name="name[]" placeholder="Nombre(s)" maxlength="65" ${requiredInput}>
             <label for="name[]">Nombre(s)</label>
           </div>
           <div class="form-floating col-3">
-            <input type="text" class="form-control" id="${name}_father_last_name_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" ${requiredInput}>
+            <input type="text" class="form-control" id="${name}_father_last_name_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" maxlength="65" ${requiredInput}>
             <label for="father_last_name[]">Apellido Paterno</label>
           </div>
           <div class="form-floating col-3">
-            <input type="text" class="form-control" id="${name}_mother_last_name_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" ${requiredInput}>
+            <input type="text" class="form-control" id="${name}_mother_last_name_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" maxlength="65" ${requiredInput}>
             <label for="mother_last_name[]">Apellido Materno</label>
           </div>
         </div>
@@ -318,19 +293,19 @@ document.addEventListener("DOMContentLoaded", function () {
               <option value="" disabled selected>Seleccionar...</option>
               <option value="Mujer">Mujer</option>
               <option value="Hombre">Hombre</option>
-              <option value="Otro">Administrador</option>
+              <option value="Otro">Otro</option>
             </select>
             <label for="gender[]">Sexo</label>
           </div>
           <div class="form-floating col-4">
-            <input type="tel" class="form-control" id="${name}_phone_number_${playerNum}" name="phone_number[]" placeholder="Número de Celular" ${requiredInput}>
+            <input type="tel" class="form-control" id="${name}_phone_number_${playerNum}" name="phone_number[]" placeholder="Número de Celular" maxlength="20" ${requiredInput}>
             <label for="phone_number[]">Número de Celular</label>
           </div>
         </div>
         
         <div class="row g-2">
           <div class="form-floating col-6 mb-3">
-            <input type="email" class="form-control" id="${name}_email_${playerNum}" name="email[]" placeholder="Correo Electrónico" ${requiredInput}>
+            <input type="email" class="form-control" id="${name}_email_${playerNum}" name="email[]" placeholder="Correo Electrónico" maxlength="50" ${requiredInput}>
             <label for="email[]">Correo Electrónico</label>
           </div>
           <div class="form-floating col-3">
@@ -489,6 +464,19 @@ async function fetchEventDates() {
     dataType: "json",
   })
     .then((response) => response.json())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+async function fetchGetDependencies() {
+  const url = `${URL_PATH}/dependencies/getDependencies`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
     .catch((error) => {
       console.error("Error:", error);
     });

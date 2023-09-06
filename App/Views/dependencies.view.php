@@ -51,8 +51,8 @@
                 <option value="" disabled selected>Seleccionar...</option>
                 <option value="BACHILLERATO">BACHILLERATO</option>
                 <option value="UNIVERSIDAD">UNIVERSIDAD</option>
+                <option value="ESCUELA SUPERIOR">ESCUELA SUPERIOR</option>
                 <option value="POSGRADO">POSGRADO</option>
-                <option value="ACÁDEMICO Y ADMINISTRATIVO">ACÁDEMICO Y ADMINISTRATIVO</option>
               </select>
               <label for="category">Categoria</label>
             </div>

@@ -3,12 +3,12 @@ version: '3'
 services:
   web:
     build:
-      context: . # Ruta al directorio donde se encuentra el Dockerfile
+      context: . 
       dockerfile: Dockerfile
     ports:
       - "80:80"
     volumes:
-      - ./:/var/www/html # Montamos el directorio del proyecto en el contenedor
+      - ./:/var/www/html 
     depends_on:
       - db
 

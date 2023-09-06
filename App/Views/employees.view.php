@@ -47,10 +47,17 @@
         <div class="modal-content border-0">
           <div class="modal-body">
             <input type="hidden" name="id" id="id">
-            <div class="form-floating">
-              <input type="text" class="form-control mb-4" name="no_employee" id="no_employee"
-                placeholder="Número de empleado" required>
-              <label for="no_employee">Número de empleado</label>
+            <div class="row g-2" id="div_acc_pass">
+              <div class="form-floating col-6" id="div_on_employee">
+                <input type="text" class="form-control mb-4" name="no_employee" id="no_employee"
+                  placeholder="Número de empleado" required>
+                <label for="no_employee">Número de empleado</label>
+              </div>
+              <div class="form-floating col-6">
+                <input type="password" class="form-control mb-4" name="password" id="password" placeholder="Contraseña"
+                  required>
+                <label for="password"=>Contraseña</label>
+              </div>
             </div>
             <div class="form-floating">
               <select class="form-select mb-4" id="dependency_name" name="id_dependency"

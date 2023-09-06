@@ -6,16 +6,9 @@
   </div>
 </div>
 
-<div class="container">
+<div class="container-fluid">
   <div class="container bg-white rounded py-5">
     <section>
-      <div class="form-floating">
-        <select class="form-select mb-4" id="category" name="category" aria-label="Default select example"
-          hx-trigger="load" hx-post="<?= URL_PATH ?>/dependencies/getcategories" hx-target="#category" required>
-          <option value="" disabled selected>Seleccionar...</option>
-        </select>
-        <label for="category">Categoria</label>
-      </div>
       <div class="form-floating">
         <select class="form-select mb-4" id="dependency" name="dependency" aria-label="Default select example" required>
           <option value="" disabled selected>Seleccionar...</option>

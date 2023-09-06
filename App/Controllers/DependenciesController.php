@@ -52,7 +52,7 @@ class DependenciesController extends Controller
     public function getDependencies()
     {
         $dependencies = $this->dependencyModel->getDependencies();
-        $options = '<option value="" disabled selected>Seleccionar una Dependencia</option>';
+        $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($dependencies as $dependency) {
             $options .= "<option value='" . $dependency['id'] . "'>" . $dependency['name'] . "</option>";
         }

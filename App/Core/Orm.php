@@ -161,7 +161,7 @@ class Orm
     ////////////////////////////////////////////////////////////////////////////////////
     public function getDependencies()
     {
-        $stm = $this->db->prepare("SELECT id, name FROM {$this->table}");
+        $stm = $this->db->prepare("SELECT id, name FROM {$this->table} ORDER BY name");
         $stm->execute();
         return $stm->fetchAll();
     }
@@ -239,6 +239,8 @@ class Orm
 
     public function getRegister()
     {
+        date_default_timezone_set("America/Mexico_City");
+        $actualDate = date("Y-m-d");
         $stm = $this->db->prepare("SELECT P.id AS Player_ID, P.acc_number AS Player_Account_Number, P.name_s AS Player_Name,
         P.father_last_name AS Player_Father_Last_Name, P.mother_last_name AS Player_Mother_Last_Name, P.birthday AS Player_Birthday,
         CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
@@ -249,7 +251,10 @@ class Orm
         INNER JOIN dbo.Team AS T ON P.id_team = T.id
         INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
         INNER JOIN dbo.Dependency AS D ON DS.id_dependency = D.id
-        INNER JOIN dbo.Sport AS S ON DS.id_sport = S.id; ");
+        INNER JOIN dbo.Sport AS S ON DS.id_sport = S.id
+        JOIN dbo.Event AS E ON T.id_event = E.id
+        WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date");
+        $stm->bindParam(':target_date', $actualDate);
         $stm->execute();
         return $stm->fetchAll();
     }

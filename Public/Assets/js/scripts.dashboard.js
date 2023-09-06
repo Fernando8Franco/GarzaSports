@@ -371,6 +371,12 @@ const createCrudTable = (
       });
 
       document.getElementById(BTN_ID).addEventListener("click", function () {
+        if(BTN_ID == 'addEmployee') {
+          document.getElementById("password").type = "password";
+          document.querySelector('label[for="password"]').className = "";
+          document.getElementById("div_on_employee").className = "form-floating col-6"
+          document.getElementById("div_acc_pass").className = "row g-2"
+        }
         document.querySelector(".modal-title").textContent = MODAL_TITLE_ADD;
         document.getElementById("action").textContent = "Agregar";
 
@@ -381,6 +387,12 @@ const createCrudTable = (
 
       document.addEventListener("click", function (e) {
         if (e.target && e.target.classList.contains(BTN_EDIT)) {
+          if(BTN_EDIT == 'editBtnEmployee') {
+            document.getElementById("password").type = "hidden";
+            document.querySelector('label[for="password"]').className = "d-none";
+            document.getElementById("div_on_employee").className = "form-floating col-12"
+            document.getElementById("div_acc_pass").className = ""
+          }
           document.querySelector(".modal-title").textContent = MODAL_TITLE_EDIT;
           document.getElementById("action").innerHTML = "Editar";
 

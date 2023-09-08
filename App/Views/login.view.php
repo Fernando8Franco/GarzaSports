@@ -44,35 +44,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("loginForm");
-    const responseModal = new bootstrap.Modal(document.getElementById("responseModal"));
-    const responseMessage = document.querySelector(".response-message");
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      const xhr = new XMLHttpRequest();
-
-      xhr.open("POST", `${URL_PATH}/admin/login`, true);
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          responseMessage.textContent = xhr.responseText;
-          if (!xhr.responseText.includes("Acceso consedido")) {
-            responseModal.show();
-          }
-          if (xhr.responseText.includes("Acceso consedido")) {
-            window.location.href = `${URL_PATH}/admin/dashboard`;
-          }
-        } else {
-          responseMessage.textContent = "Error en la solicitud.";
-          responseModal.show(); // Abre el modal
-        }
-      };
-      xhr.send(formData);
-    });
-  });
-</script>

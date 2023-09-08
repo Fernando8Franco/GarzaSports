@@ -10,7 +10,7 @@ class AdminController extends Controller
     }
     public function index()
     {
-        $this->render('login', 'index');
+        $this->render('login', 'login');
     }
 
     public function dashboard()

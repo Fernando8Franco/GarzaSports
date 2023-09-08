@@ -311,6 +311,7 @@ let dataTableIsInitialized = false;
 
 const createCrudTable = (
   TABLE,
+  CRUDNAME,
   COLUMNS,
   FORM_NAME,
   MODAL_NAME,
@@ -350,7 +351,7 @@ const createCrudTable = (
         formData.append("option", option);
 
         try {
-          const response = await fetch(`${URL_PATH}/${TABLE}/${TABLE}CRUD`, {
+          const response = await fetch(`${URL_PATH}/${TABLE}/${CRUDNAME}`, {
             method: "POST",
             body: formData,
           });
@@ -371,11 +372,12 @@ const createCrudTable = (
       });
 
       document.getElementById(BTN_ID).addEventListener("click", function () {
-        if(BTN_ID == 'addEmployee') {
+        if (BTN_ID == "addEmployee") {
           document.getElementById("password").type = "password";
           document.querySelector('label[for="password"]').className = "";
-          document.getElementById("div_on_employee").className = "form-floating col-6"
-          document.getElementById("div_acc_pass").className = "row g-2"
+          document.getElementById("div_on_employee").className =
+            "form-floating col-6";
+          document.getElementById("div_acc_pass").className = "row g-2";
         }
         document.querySelector(".modal-title").textContent = MODAL_TITLE_ADD;
         document.getElementById("action").textContent = "Agregar";
@@ -387,11 +389,13 @@ const createCrudTable = (
 
       document.addEventListener("click", function (e) {
         if (e.target && e.target.classList.contains(BTN_EDIT)) {
-          if(BTN_EDIT == 'editBtnEmployee') {
+          if (BTN_EDIT == "editBtnEmployee") {
             document.getElementById("password").type = "hidden";
-            document.querySelector('label[for="password"]').className = "d-none";
-            document.getElementById("div_on_employee").className = "form-floating col-12"
-            document.getElementById("div_acc_pass").className = ""
+            document.querySelector('label[for="password"]').className =
+              "d-none";
+            document.getElementById("div_on_employee").className =
+              "form-floating col-12";
+            document.getElementById("div_acc_pass").className = "";
           }
           document.querySelector(".modal-title").textContent = MODAL_TITLE_EDIT;
           document.getElementById("action").innerHTML = "Editar";
@@ -411,19 +415,23 @@ const createCrudTable = (
           const rowData = dataTable.row(row).data();
           const id = parseInt(rowData.id);
 
-          if (!rowData.toBeDeleted) {
-            rowData.toBeDeleted = true;
-            const confirmMessage = `¿Está seguro de borrar el evento "${rowData.name}"?`;
-            const answer = confirm(confirmMessage);
-
-            if (answer) {
+          Swal.fire({
+            title: "¿Está seguro?",
+            text: "No podra volver a recuperar esta infomación",
+            icon: "warning",
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, estoy seguro!",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
               const formDataDelete = new FormData();
               formDataDelete.append("id", id);
               formDataDelete.append("option", option);
-
               try {
                 const response = await fetch(
-                  `${URL_PATH}/${TABLE}/${TABLE}CRUD`,
+                  `${URL_PATH}/${TABLE}/${CRUDNAME}`,
                   {
                     method: "POST",
                     body: formDataDelete,
@@ -441,12 +449,13 @@ const createCrudTable = (
                 console.error("Error:", error);
                 alert("No se pudo completar la operación.");
               }
-            } else {
-              setTimeout(function () {
-                rowData.toBeDeleted = false;
-              }, 500);
+              Swal.fire(
+                "¡Eliminado!",
+                "Elemento eliminado correctamente.",
+                "success"
+              );
             }
-          }
+          });
         }
       });
     });
@@ -454,6 +463,7 @@ const createCrudTable = (
 
 createCrudTable(
   "events",
+  "eventsCRUD",
   [
     { data: "id", visible: false },
     { data: "name" },
@@ -492,6 +502,7 @@ createCrudTable(
 
 createCrudTable(
   "dependencies",
+  "dependenciesCRUD",
   [
     { data: "id", visible: false },
     { data: "name" },
@@ -521,6 +532,7 @@ createCrudTable(
 
 createCrudTable(
   "employees",
+  "employeesCRUD",
   [
     { data: "id", visible: false },
     { data: "id_dependency", visible: false },
@@ -528,9 +540,8 @@ createCrudTable(
     { data: "dependency_name" },
     { data: "name_s" },
     {
-      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      data: null,
       render: function (data, type, full, meta) {
-        // Combina los valores de father_last_name y mother_last_name
         return full.father_last_name + " " + full.mother_last_name;
       },
     },
@@ -571,6 +582,7 @@ createCrudTable(
 
 createCrudTable(
   "sports",
+  "sportsCRUD",
   [
     { data: "id", visible: false },
     { data: "name" },
@@ -612,6 +624,7 @@ createCrudTable(
 
 createCrudTable(
   "teams",
+  "teamsCRUD",
   [
     { data: "id", visible: false },
     { data: "name" },
@@ -650,27 +663,25 @@ createCrudTable(
 
 createCrudTable(
   "register",
+  "registerCRUD",
   [
     { data: "Player_ID", visible: false },
     {
-      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      data: null,
       render: function (data, type, full, meta) {
-        // Combina los valores de father_last_name y mother_last_name
         return full.Team_Name + "<br>" + full.Record_Date;
       },
     },
     { data: "Dependency_Name" },
     {
-      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      data: null,
       render: function (data, type, full, meta) {
-        // Combina los valores de father_last_name y mother_last_name
         return full.Sport_Name + "<br>" + "Rama: " + full.Sport_Gender;
       },
     },
     {
-      data: null, // Utilizamos null aquí para que DataTables no busque datos en el origen de datos
+      data: null,
       render: function (data, type, full, meta) {
-        // Combina los valores de father_last_name y mother_last_name
         return (
           "No. cuenta: " +
           full.Player_Account_Number +
@@ -724,4 +735,46 @@ createCrudTable(
   "editRegister",
   "deleteRegister",
   (rowData) => {}
+);
+
+createCrudTable(
+  "dependenciesSports",
+  "sportsCRUD",
+  [
+    { data: "id", visible: false },
+    { data: "name" },
+    { data: "type" },
+    { data: "gender" },
+    { data: "num_players" },
+    { data: "num_extraplayers" },
+    { data: "has_captain" },
+    {
+      defaultContent:
+        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnSport' data-bs-toggle='modal' data-bs-target='#modalSport'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnSport'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
+    },
+  ],
+  "sportForm",
+  "modalSport",
+  "addSport",
+  "Agregar Deporte",
+  "Editar Deporte",
+  "editBtnSport",
+  "deleteBtnSport",
+  (rowData) => {
+    var id = parseInt(rowData.id);
+    var name = rowData.name;
+    var type = rowData.type;
+    var gender = rowData.gender;
+    var num_players = rowData.num_players;
+    var num_extraplayers = rowData.num_extraplayers;
+    var has_captain = rowData.has_captain;
+
+    document.getElementById("id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("type").value = type;
+    document.getElementById("gender").value = gender;
+    document.getElementById("num_players").value = num_players;
+    document.getElementById("num_extraplayers").value = num_extraplayers;
+    document.getElementById("has_captain").value = has_captain;
+  }
 );

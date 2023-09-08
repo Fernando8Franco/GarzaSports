@@ -1,27 +1,3 @@
-:root {
-  --header-height: 3rem;
-  --nav-width: 68px;
-  --normal-font-size: 1rem;
-  --z-fixed: 100;
-  --red: #b91116;
-  --orange: #e24622;
-  --orange2: #e8641c;
-  --yellow: #f39200;
-  --darkgrey: #575756;
-  --grey: #9d9d9d;
-  --darkred: #841816;
-  --cream: #f8b688;
-  --bs-body-font-family: "Helvetica", "Arial", sans-serif;
-}
-.btn-danger {
-  background-color: var(--red) !important;
-}
-.btn-secondary {
-  background-color: var(--darkgrey) !important;
-}
-.bg-info {
-  background-color: var(--cream) !important;
-}
 *,
 ::before,
 ::after {
@@ -73,7 +49,6 @@ a {
   left: -30%;
   width: var(--nav-width);
   height: 100vh;
-  /* background-color: var(--darkred); */
   background: linear-gradient(
     to bottom right,
     var(--red),
@@ -114,7 +89,7 @@ a {
 .nav_link {
   position: relative;
   color: white;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   transition: 0.3s;
 }
 .nav_link:hover {

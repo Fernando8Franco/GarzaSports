@@ -8,8 +8,7 @@
     <?= $_SESSION['role_emp'] ?>
   </div>
 </header>
-<div class="navbar-container">
-  <div class="l-navbar" id="nav-bar">
+<div class="l-navbar" id="nav-bar">
     <nav class="nav">
       <div>
         <a href="" class="nav_logo">
@@ -43,6 +42,11 @@
               id="sports_link" title="Deportes">
               <i class="fa-solid fa-volleyball nav_icon"></i>
               <span class="nav_name">Deportes</span>
+            </a>
+            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/dependenciessports/index" hx-target="#targetPHP" hx-trigger="click"
+              id="dependenciesSports_link" title="Habilitar Deportes">
+              <i class="fa-brands fa-megaport fa-lg"></i>
+              <span class="nav_name">Habilitar Deportes</span>
             </a>
             <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/register/index" hx-target="#targetPHP" hx-trigger="click"
               id="register_link" title="Inscripciones">
@@ -103,7 +107,6 @@
       </a>
     </nav>
   </div>
-</div>
 <!--Container Main start-->
 <div class="main">
   <main class="content px-3 py-2">

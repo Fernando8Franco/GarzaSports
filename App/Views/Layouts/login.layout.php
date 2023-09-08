@@ -1,14 +1,3 @@
-<?php
-        $url = explode('/', URL);
-        $page = $url[1];
-
-        if (strtolower($page) === "index" || $page === "") {
-            $pageName = "Registro";
-        }else if (strtolower($page) === "admin") {
-            $pageName = "Admin LogIn";
-        }  
-?>
-
 <!DOCTYPE html>
 <html lang="es" id="htmlLogin">
 <head>
@@ -24,6 +13,7 @@
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/brands.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/solid.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/croppie/css/cdnjs.cloudflare.com_ajax_libs_croppie_2.6.5_croppie.min.css" />
+    <link rel="stylesheet" href="<?= URL_PATH ?>/assets/sweetalert2/css/sweetalert2.min.css">
 
     
     <title><?= $pageName ?></title>
@@ -37,6 +27,7 @@
         <script src="<?= URL_PATH ?>/assets/croppie/js/cdnjs.cloudflare.com_ajax_libs_croppie_2.6.5_croppie.min.js"></script>
         <script src="<?= URL_PATH ?>/assets/js/htmx-1.9.min.js"></script>
         <script src="<?= URL_PATH ?>/assets/bootstrap-5/js/bootstrap.min.js"></script>
-        <script src="<?= URL_PATH ?>/assets/js/scripts.index.js"></script>
+        <script src="<?= URL_PATH ?>/assets/js/scripts.login.js"></script>
+        <script src="<?= URL_PATH ?>/assets/sweetalert2/js/sweetalert2.all.min.js"></script>
     </body>
 </html>

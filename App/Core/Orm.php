@@ -33,6 +33,29 @@ class Orm
     $stm->execute();
   }
 
+  public function deleteByIdEvent($id)
+  {
+    try {
+      $this->db->beginTransaction();
+      $stm = $this->db->prepare("DELETE FROM dbo.Player WHERE id_team IN (SELECT id FROM dbo.Team WHERE id_event = :eventoID)");
+      $stm->bindParam(':eventoID', $id, PDO::PARAM_INT);
+      $stm->execute();
+
+      $stm = $this->db->prepare("DELETE FROM dbo.Team WHERE id_event = :eventoID");
+      $stm->bindParam(':eventoID', $id, PDO::PARAM_INT);
+      $stm->execute();
+
+      $stm = $this->db->prepare("DELETE FROM dbo.Event WHERE id = :eventoID");
+      $stm->bindParam(':eventoID', $id, PDO::PARAM_INT);
+      $stm->execute();
+
+      $this->db->commit();
+    } catch (Exception $e) {
+      $this->db->rollBack();
+      echo "Error: " . $e->getMessage();
+    }
+  }
+
   public function deleteByIdDependency_Sport($id)
   {
     $stm = $this->db->prepare("DELETE FROM Dependency_Sport WHERE id_{$this->table} = :id");

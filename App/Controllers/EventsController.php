@@ -58,7 +58,7 @@ class EventsController extends Controller
           $events = $this->eventModel->getAllDates();
           break;
         case 3:
-          $this->eventModel->deleteById($data['id']);
+          $this->eventModel->deleteByIdEvent($data['id']);
           $events = $this->eventModel->getAllDates();
           break;
         case 4:

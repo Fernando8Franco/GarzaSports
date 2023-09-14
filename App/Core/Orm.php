@@ -173,6 +173,18 @@ class Orm
   }
 
   ////////////////////////////////////////////////////////////////////////////////////
+  // CONSULT EMPLOYEES
+  ////////////////////////////////////////////////////////////////////////////////////
+  public function getAllSports()
+  {
+    $stm = $this->db->prepare("SELECT id, name, type, gender, num_players, num_extraplayers,
+        CASE WHEN has_captain = 0 THEN '<i class=\"fa-solid fa-xmark\"></i>' WHEN has_captain = 1 THEN '<i class=\"fa-solid fa-check\"></i>'
+        END AS has_captain FROM {$this->table}");
+    $stm->execute();
+    return $stm->fetchAll();
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////
   // CONSULT DEPENDENCY
   ////////////////////////////////////////////////////////////////////////////////////
   public function getDependencies()
@@ -212,7 +224,8 @@ class Orm
         FROM Dependency_Sport DS
         INNER JOIN Dependency D ON DS.id_dependency = D.id
         INNER JOIN Sport S ON DS.id_sport = S.id
-        WHERE D.id = :dependency AND DS.is_active = 1");
+        WHERE D.id = :dependency AND DS.is_active = 1
+        ORDER BY S.gender");
     $stm->bindParam(':dependency', $dependency);
     $stm->execute();
     return $stm->fetchAll();
@@ -227,7 +240,8 @@ class Orm
         FROM Dependency_Sport DS
         INNER JOIN Dependency D ON DS.id_dependency = D.id
         INNER JOIN Sport S ON DS.id_sport = S.id
-        WHERE D.id = :dependency AND DS.is_active = 1 AND S.gender = :gender");
+        WHERE D.id = :dependency AND DS.is_active = 1 AND S.gender = :gender
+        ORDER BY S.name");
     $stm->bindParam(':dependency', $dependency);
     $stm->bindParam(':gender', $gender);
     $stm->execute();
@@ -324,7 +338,8 @@ class Orm
     return $stm->fetchAll();
   }
 
-  public function getTeamByAccEmail($acc_number, $email) {
+  public function getTeamByAccEmail($acc_number, $email)
+  {
     date_default_timezone_set("America/Mexico_City");
     $actualDate = date("Y-m-d");
     $stm = $this->db->prepare("SELECT T.id
@@ -338,6 +353,33 @@ class Orm
     $stm->execute();
     return $stm->fetch();
   }
+
+  public function getTeamByAccEmailDependencyGenderSport($acc_number, $email, $dependency, $gender, $sport)
+  {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT T.id
+    FROM {$this->table} T
+    INNER JOIN dbo.Player P ON T.id = P.id_team
+    JOIN dbo.Event AS E ON CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
+    JOIN dbo.Dependency_Sport DS ON P.id_dependency = DS.id_dependency
+    JOIN dbo.Sport S ON DS.id_sport = S.id
+    WHERE P.acc_number = :acc_number 
+    AND P.email = :email 
+    AND DS.id_dependency = :dependency 
+    AND S.gender = :gender 
+    AND S.id = :sport");
+    $stm->bindParam(':acc_number', $acc_number, PDO::PARAM_STR);
+    $stm->bindParam(':email', $email, PDO::PARAM_STR);
+    $stm->bindParam(':dependency', $dependency, PDO::PARAM_INT);
+    $stm->bindParam(':gender', $gender, PDO::PARAM_STR);
+    $stm->bindParam(':sport', $sport, PDO::PARAM_STR);
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->execute();
+    return $stm->fetch();
+  }
+
+
 
   public function getRegisterByTeam($team_id)
   {

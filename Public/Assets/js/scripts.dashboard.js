@@ -62,6 +62,12 @@ const dataTableConfig = {
   dom: "lBfrtip",
   buttons: [
     {
+      extend: "excel",
+      className: "btn btn-success",
+      text: "<i class='fa-solid fa-file-csv'></i> Excel",
+      title: "Registros"
+    },
+    {
       extend: "print",
       className: "btn btn-danger text-white",
       text: "<i class='fa-solid fa-print'></i> Imprimir",
@@ -752,9 +758,9 @@ createCrudTable(
     { data: "name" },
     { data: "type" },
     { data: "gender" },
-    { data: "num_players" },
-    { data: "num_extraplayers" },
-    { data: "has_captain" },
+    { data: "num_players", className: "text-center" },
+    { data: "num_extraplayers", className: "text-center" },
+    { data: "has_captain", className: "text-center" },
     {
       defaultContent:
         "<div class='text-center'><button class='btn btn-primary btn-sm editBtnSport' data-bs-toggle='modal' data-bs-target='#modalSport'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnSport'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
@@ -782,7 +788,7 @@ createCrudTable(
     document.getElementById("gender").value = gender;
     document.getElementById("num_players").value = num_players;
     document.getElementById("num_extraplayers").value = num_extraplayers;
-    document.getElementById("has_captain").value = has_captain;
+    document.getElementById("has_captain").value = formatStatus(has_captain);
   }
 );
 

@@ -9,7 +9,6 @@
     <!-- CSS -->
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/bootstrap-5/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/css/styles.default.css">
-    <link rel="stylesheet" href="<?= URL_PATH ?>/assets/css/styles.index.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/fontawesome.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/brands.css">
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/solid.css">

@@ -67,8 +67,11 @@ class TeamsController extends Controller
   {
     $acc_number = $_POST['acc_number'] ?? '';
     $email = $_POST['email'] ?? '';
+    $dependency = $_POST['dependency'] ?? '';
+    $branch = $_POST['branch'] ?? '';
+    $sport = $_POST['sport'] ?? '';
 
-    $id_team = $this->teamModel->getTeamByAccEmail($acc_number, $email);
+    $id_team = $this->teamModel->getTeamByAccEmailDependencyGenderSport($acc_number, $email, $dependency, $branch, $sport);
 
     if (!empty($id_team)) {
       $register = $this->teamModel->getRegisterByTeam($id_team['id']);

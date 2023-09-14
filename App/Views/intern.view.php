@@ -13,7 +13,7 @@
         <select class="form-select mb-4" id="dependency" name="dependency" aria-label="Default select example" required>
           <option value="" disabled selected>Seleccionar...</option>
         </select>
-        <label for="dependency">Depenencia</label>
+        <label for="dependency">Dependencia</label>
       </div>
       <div class="form-floating">
         <select class="form-select mb-4" id="branch" name="branch" aria-label="Default select example" required>

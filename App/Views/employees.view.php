@@ -93,8 +93,8 @@
               </div>
               <div class="form-floating col-6">
                 <select class="form-select mb-4" id="is_active" name="is_active" aria-label="Default select example">
-                  <option value="0">INACTIVO</option>
                   <option value="1">ACTIVO</option>
+                  <option value="0">INACTIVO</option>
                 </select>
                 <label for="is_active">Status</label>
               </div>

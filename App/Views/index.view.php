@@ -12,7 +12,7 @@
                 <div class="card border-0 shadow-lg">
                     <div class="my-3">
                         <div class="my-3">
-                            <i class="fa-solid fa-user" style="font-size: 192px"></i>
+                            <i class="fa-solid fa-user indexIcon"></i>
                         </div>
                         <p class="h3">Registro</p>
                         <div class="card-body">
@@ -31,7 +31,7 @@
                 <div class="card border-0 shadow-lg">
                     <div class="my-3">
                         <div class="my-3">
-                            <i class="fa-solid fa-users-viewfinder" style="font-size: 192px"></i>
+                            <i class="fa-solid fa-users-viewfinder indexIcon"></i>
                         </div>
                         <p class="h3">Ver Registro</p>
                         <div class="card-body">

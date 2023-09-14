@@ -46,7 +46,7 @@
             <input type="hidden" name="id" id="id">
             <div class="form-floating">
               <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento"
-                required>
+                required onblur="this.value=this.value.trim()">
               <label for="name">Nombre del Deporte</label>
             </div>
             <div class="row g-2">
@@ -63,7 +63,6 @@
                   <option value="" disabled selected>Seleccionar...</option>
                   <option value="Varonil">Varonil</option>
                   <option value="Femenil">Femenil</option>
-                  <option value="Mixto">Mixto</option>
                 </select>
                 <label for="gender">Rama</label>
               </div>

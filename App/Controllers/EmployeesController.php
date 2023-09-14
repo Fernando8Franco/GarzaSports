@@ -54,11 +54,11 @@ class EmployeesController extends Controller
         break;
       case 2:
         $this->employeeModel->updateById($data['id'], $data);
-        $employees = $this->employeeModel->getAll();
+        $employees = $this->employeeModel->getAllEmployees();
         break;
       case 3:
         $this->employeeModel->deleteById($data['id']);
-        $employees = $this->employeeModel->getAll();
+        $employees = $this->employeeModel->getAllEmployees();
         break;
       case 4:
         $employees = $this->employeeModel->getAllEmployees();

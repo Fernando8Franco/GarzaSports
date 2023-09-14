@@ -35,18 +35,18 @@ class SportsController extends Controller {
         switch ($option) {
             case 1:
                 $this->sportModel->insert($data);
-                $sports = $this->sportModel->getAll();
+                $sports = $this->sportModel->getAllSports();
                 break;
             case 2:
                 $this->sportModel->updateById($data['id'], $data);
-                $sports = $this->sportModel->getAll();
+                $sports = $this->sportModel->getAllSports();
                 break;
             case 3:
                 $this->sportModel->deleteByIdDependency_Sport($data['id']);
-                $sports = $this->sportModel->getAll();
+                $sports = $this->sportModel->getAllSports();
                 break;
             case 4:
-                $sports = $this->sportModel->getAll();
+                $sports = $this->sportModel->getAllSports();
                 break;
         }
         

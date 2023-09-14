@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
     teamName.className = "container";
     teamName.innerHTML = `
         <div class="form-floating">
-          <input type="text" class="form-control mt-5 mb-3" name="team_name" id="team_name" placeholder="Nombre del Equipo" maxlength="80" required>
+          <input type="text" class="form-control mt-5 mb-3" name="team_name" id="team_name" placeholder="Nombre del Equipo" maxlength="80" onblur="this.value=this.value.trim()" required>
           <label for="team_name">Nombre del Equipo</label>
         </div>
     `;
@@ -303,15 +303,15 @@ document.addEventListener("DOMContentLoaded", function () {
             <label for="acc_number[]">Número de cuenta</label>
           </div>
           <div class="form-floating">
-            <input type="text" class="form-control mb-2" id="${name}_name_${playerNum}" name="name[]" placeholder="Nombre(s)" maxlength="65" ${requiredInput}>
+            <input type="text" class="form-control mb-2" id="${name}_name_${playerNum}" name="name[]" placeholder="Nombre(s)" maxlength="65" onblur="this.value=this.value.trim()" ${requiredInput}>
             <label for="name[]">Nombre(s)</label>
           </div>
           <div class="form-floating">
-            <input type="text" class="form-control mb-2" id="${name}_father_last_name_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" maxlength="65" ${requiredInput}>
+            <input type="text" class="form-control mb-2" id="${name}_father_last_name_${playerNum}" name="father_last_name[]" placeholder="Apellido Paterno" maxlength="65" onblur="this.value=this.value.trim()" ${requiredInput}>
             <label for="father_last_name[]">Apellido Paterno</label>
           </div>
           <div class="form-floating">
-            <input type="text" class="form-control mb-2" id="${name}_mother_last_name_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" maxlength="65" ${requiredInput}>
+            <input type="text" class="form-control mb-2" id="${name}_mother_last_name_${playerNum}" name="mother_last_name[]" placeholder="Apellido Materno" maxlength="65" onblur="this.value=this.value.trim()" ${requiredInput}>
             <label for="mother_last_name[]">Apellido Materno</label>
           </div>
         </div>
@@ -330,14 +330,14 @@ document.addEventListener("DOMContentLoaded", function () {
             <label for="gender[]">Sexo</label>
           </div>
           <div class="form-floating mb-2">
-            <input type="tel" class="form-control" id="${name}_phone_number_${playerNum}" name="phone_number[]" placeholder="Número de Celular" maxlength="20" ${requiredInput}>
+            <input type="tel" class="form-control" id="${name}_phone_number_${playerNum}" name="phone_number[]" placeholder="Número de Celular" maxlength="20" onblur="this.value=this.value.trim()" ${requiredInput}>
             <label for="phone_number[]">Número de Celular</label>
           </div>
         </div>
         
         <div class="">
           <div class="form-floating mb-2">
-            <input type="email" class="form-control" id="${name}_email_${playerNum}" name="email[]" placeholder="Correo Electrónico" maxlength="50" ${requiredInput}>
+            <input type="email" class="form-control" id="${name}_email_${playerNum}" name="email[]" placeholder="Correo Electrónico" maxlength="50" onblur="this.value=this.value.trim()" ${requiredInput}>
             <label for="email[]">Correo Electrónico</label>
           </div>
           <div class="form-floating mb-2">
@@ -359,18 +359,16 @@ document.addEventListener("DOMContentLoaded", function () {
           <img id="${name}_cropp_photo_${playerNum}" src="${URL_PATH}/assets/images/user256px.png" alt="Imagen recortada" style="max-width: 100%; width: 180px; height: 180px;">
         </div>
 
-        <div class="modal fade" id="${name}_cropModal_${playerNum}" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+        <div class="modal fade" id="${name}_cropModal_${playerNum}" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static">
           <div class="modal-dialog">
               <div class="modal-content">
                   <div class="modal-header">
                       <h5 class="modal-title" id="cropModalLabel">Recortar Imagen</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                       <div id="${name}_croppie-container_${playerNum}"></div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                       <button type="button" class="btn btn-danger" id="${name}_cropImage_${playerNum}">Recortar</button>
                   </div>
               </div>

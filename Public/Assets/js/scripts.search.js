@@ -1,39 +1,143 @@
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("searchForm");
   const dataTableContainer = document.getElementById("container");
+  function areSelectsSelected() {
+    return (
+      dependencySelect.value !== "" &&
+      sportSelect.value !== "" &&
+      branchSelect.value != ""
+    );
+  }
+  const dependencySelect = document.getElementById("dependency");
+  const sportSelect = document.getElementById("sport");
+  const branchSelect = document.getElementById("branch");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  const fetchPromiseGetDependencies = fetchGetDependencies();
+  fetchPromiseGetDependencies.then((data) => {
+    dependencySelect.innerHTML = data;
+    branchSelect.innerHTML =
+      '<option value="" disabled selected>Seleccionar...</option>';
+    sportSelect.innerHTML =
+      '<option value="" disabled selected>Seleccionar...</option>';
+  });
 
-    const formData = new FormData(form);
-    try {
-      const response = await fetch(`${URL_PATH}/teams/getTeam`, {
-        method: "POST",
-        body: formData,
+  dependencySelect.addEventListener("change", function () {
+    const selectedDependency = dependencySelect.value;
+
+    // Realizar la solicitud AJAX para cargar los deportes basados en la dependencia seleccionada
+    const dataToSend = {
+      dependency: selectedDependency,
+    };
+
+    const apiUrl = `${URL_PATH}/dependencies/getbranches`;
+
+    // Configuración de la solicitud
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Indicamos que estamos enviando JSON en el cuerpo
+      },
+      body: JSON.stringify(dataToSend), // Convertimos los datos a JSON y los enviamos en el cuerpo
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then((response) => response.text()) // Parseamos la respuesta JSON
+      .then((data) => {
+        branchSelect.innerHTML = data;
+        sportSelect.innerHTML =
+          '<option value="" disabled selected>Seleccionar...</option>';
+      })
+      .catch((error) => {
+        console.error("Error al hacer la solicitud:", error);
       });
+  });
 
-      if (response.ok) {
-        const data = await response.json();
-        if(data[0]['Player_ID'] == "NO REGISTRADO") {
-          Swal.fire({
-            icon: 'error',
-            title: 'No se encontro el registro',
-            text: 'El número de cuenta o correo no se encuentran en los registros'
+  branchSelect.addEventListener("change", function () {
+    const selectedDependency = dependencySelect.value;
+    const selectedBranch = branchSelect.value;
+
+    // Realizar la solicitud AJAX para cargar los deportes basados en la dependencia seleccionada
+    const dataToSend = {
+      gender: selectedBranch,
+      dependency: selectedDependency,
+    };
+
+    const apiUrl = `${URL_PATH}/dependencies/getSportsByDependency`;
+
+    // Configuración de la solicitud
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Indicamos que estamos enviando JSON en el cuerpo
+      },
+      body: JSON.stringify(dataToSend), // Convertimos los datos a JSON y los enviamos en el cuerpo
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then((response) => response.text()) // Parseamos la respuesta JSON
+      .then((data) => {
+        sportSelect.innerHTML = data;
+      })
+      .catch((error) => {
+        console.error("Error al hacer la solicitud:", error);
+      });
+  });
+
+  sportSelect.addEventListener("change", function () {
+    if (areSelectsSelected()) {
+      const selectedSport = sportSelect.value;
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+    
+        const formData = new FormData(form);
+        // formData.forEach((valor, clave) => {
+        //   console.log(clave, valor);
+        // });
+        
+        try {
+          const response = await fetch(`${URL_PATH}/teams/getTeam`, {
+            method: "POST",
+            body: formData,
           });
-        } else {
-          dataTableContainer.style.display = "block";
-          initDataTable(data);
+    
+          if (response.ok) {
+            const data = await response.json();
+            if(data[0]['Player_ID'] == "NO REGISTRADO") {
+              Swal.fire({
+                icon: 'error',
+                title: 'No se encontro el registro',
+                text: 'El número de cuenta o correo no se encuentran en los registros'
+              });
+            } else {
+              dataTableContainer.style.display = "block";
+              initDataTable(data);
+            }
+          } else {
+            console.error("Error:", response.statusText);
+            alert("No se pudo completar la operación.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("No se pudo completar la operación.");
         }
-      } else {
-        console.error("Error:", response.statusText);
-        alert("No se pudo completar la operación.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("No se pudo completar la operación.");
+      });
     }
   });
 });
+
+async function fetchGetDependencies() {
+  const url = `${URL_PATH}/dependencies/getDependencies`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
 
 let dataTable;
 let dataTableIsInitialized = false;
@@ -58,7 +162,7 @@ const dataTableLanguage = {
   },
 };
 
-function initDataTable (dataTeam) {
+function initDataTable(dataTeam) {
   try {
     if (dataTableIsInitialized) {
       dataTable.destroy();
@@ -191,4 +295,4 @@ function initDataTable (dataTeam) {
   } catch (error) {
     console.error("Error:", error);
   }
-};
+}

@@ -113,53 +113,29 @@ const initDataTable = async (table, columns, crudname) => {
     option = 4;
     id_dependency = ID_DEPENDENCY;
 
-    if (table != "register") {
-      dataTable = new DataTable("#datatable", {
-        ajax: {
-          url: URL_PATH + "/" + table + "/" + crudname,
-          method: "POST",
-          data: { option: option},
-          dataSrc: "",
+    dataTable = new DataTable("#datatable", {
+      ...dataTableConfig,
+      paging: false,
+      ajax: {
+        url: URL_PATH + "/" + table + "/" + crudname,
+        method: "POST",
+        data: { option: option, id_dependency: id_dependency },
+        dataSrc: "",
+      },
+      columns: columns,
+      order: [[0, "asc"]],
+      columnDefs: [
+        {
+          targets: 1, // Target the "name" column (index 1)
+          orderData: [0], // Use data from the "id" column (index 0) for ordering
         },
-        columns: columns,
-        order: [[0, "desc"]],
-        columnDefs: [
-          {
-            targets: 1, // Target the "name" column (index 1)
-            orderData: [0], // Use data from the "id" column (index 0) for ordering
-          },
-        ],
-        language: dataTableLanguage,
-        lengthMenu: [
-          [10, 25, 50, 250, -1],
-          [10, 25, 50, 250, "Todos"],
-        ],
-      });
-    } else {
-      dataTable = new DataTable("#datatable", {
-        ...dataTableConfig,
-        paging: false,
-        ajax: {
-          url: URL_PATH + "/" + table + "/" + crudname,
-          method: "POST",
-          data: { option: option, id_dependency: id_dependency },
-          dataSrc: "",
-        },
-        columns: columns,
-        order: [[0, "asc"]],
-        columnDefs: [
-          {
-            targets: 1, // Target the "name" column (index 1)
-            orderData: [0], // Use data from the "id" column (index 0) for ordering
-          },
-          { width: "100px", targets: 1 },
-          { width: "150px", targets: 2 },
-          { width: "100px", targets: 3 },
-        ],
-        language: dataTableLanguage,
-        lengthMenu: [[-1], ["Todos"]],
-      });
-    }
+        { width: "100px", targets: 1 },
+        { width: "150px", targets: 2 },
+        { width: "100px", targets: 3 },
+      ],
+      language: dataTableLanguage,
+      lengthMenu: [[-1], ["Todos"]],
+    });
 
     dataTableIsInitialized = true;
   } catch (error) {
@@ -326,8 +302,8 @@ const createCrudTable = (
   document
     .getElementById(`${TABLE}_link`)
     .addEventListener("htmx:afterOnLoad", async function () {
-      if(TABLE == 'registerByDependency') {
-        TABLE = 'register';
+      if (TABLE == "registerByDependency") {
+        TABLE = "register";
       }
       await initDataTable(TABLE, COLUMNS, CRUDNAME);
 

@@ -40,6 +40,10 @@ if (!isset($_SESSION['name_s'])) {
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_dataTables.bootstrap5.min.js"></script>
   <script
     src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_dataTables.buttons.min.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdnjs.cloudflare.com_ajax_libs_jszip_3.10.1_jszip.min.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdnjs.cloudflare.com_ajax_libs_pdfmake_0.1.53_pdfmake.min.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdnjs.cloudflare.com_ajax_libs_pdfmake_0.1.53_vfs_fonts.js"></script>
+  <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_buttons.html5.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_buttons.print.min.js"></script>
   <?php if ($_SESSION['role_emp'] === 'Administrador'): ?>
     <script src="<?= URL_PATH ?>/assets/js/scripts.dashboard.js"></script>

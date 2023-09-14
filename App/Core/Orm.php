@@ -144,6 +144,22 @@ class Orm
     return $stm->fetch();
   }
 
+  public function getEventByIns()
+  {
+    date_default_timezone_set("America/Mexico_City"); // Set your desired time zone
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT id, name, 
+        CONVERT(VARCHAR(11), start_date, 106) as start_date, 
+        CONVERT(VARCHAR(11), end_date, 106) as end_date, 
+        CONVERT(VARCHAR(11), ins_start_date, 106) as ins_start_date, 
+        CONVERT(VARCHAR(11), ins_end_date, 106) as ins_end_date 
+        FROM {$this->table}
+        WHERE CONVERT(DATE, :target_date) BETWEEN ins_start_date AND ins_end_date;");
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->execute();
+    return $stm->fetch();
+  }
+
   ////////////////////////////////////////////////////////////////////////////////////
   // CONSULT EMPLOYEES
   ////////////////////////////////////////////////////////////////////////////////////
@@ -260,11 +276,40 @@ class Orm
     return $stm->fetchAll();
   }
 
+  public function getRegisterByDependency($id_dependency)
+  {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT P.id AS Player_ID, P.acc_number AS Player_Account_Number, P.name_s AS Player_Name,
+        P.father_last_name AS Player_Father_Last_Name, P.mother_last_name AS Player_Mother_Last_Name, P.birthday AS Player_Birthday,
+        CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
+        P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
+        CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
+        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
+        INNER JOIN dbo.Team AS T ON P.id_team = T.id
+        INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
+        INNER JOIN dbo.Dependency AS D ON DS.id_dependency = D.id
+        INNER JOIN dbo.Sport AS S ON DS.id_sport = S.id
+        JOIN dbo.Event AS E ON T.id_event = E.id
+        WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
+        AND D.id = :id_dependency");
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->bindParam(':id_dependency', $id_dependency);
+    $stm->execute();
+    return $stm->fetchAll();
+  }
+
   public function getCount($tableName1, $tableName2)
   {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
     $stm = $this->db->prepare("SELECT
         (SELECT COUNT(*) FROM $tableName1) AS rows_$tableName1,
-        (SELECT COUNT(*) FROM $tableName2) AS rows_$tableName2");
+        (SELECT COUNT(*) FROM $tableName2) AS rows_$tableName2
+        FROM dbo.Event AS E
+        WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date");
+    $stm->bindParam(':target_date', $actualDate);
     $stm->execute();
     return $stm->fetch();
   }
@@ -275,6 +320,45 @@ class Orm
     FROM Dependency_Sport AS DS
     JOIN Dependency AS D ON DS.id_dependency = D.id
     JOIN Sport AS S ON DS.id_sport = S.id");
+    $stm->execute();
+    return $stm->fetchAll();
+  }
+
+  public function getTeamByAccEmail($acc_number, $email) {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT T.id
+    FROM {$this->table} T
+    INNER JOIN dbo.Player P ON T.id = P.id_team
+    JOIN dbo.Event AS E ON CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
+    WHERE P.acc_number = :acc_number AND P.email = :email");
+    $stm->bindParam(':acc_number', $acc_number, PDO::PARAM_STR);
+    $stm->bindParam(':email', $email, PDO::PARAM_STR);
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->execute();
+    return $stm->fetch();
+  }
+
+  public function getRegisterByTeam($team_id)
+  {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT P.id AS Player_ID, P.acc_number AS Player_Account_Number, P.name_s AS Player_Name,
+        P.father_last_name AS Player_Father_Last_Name, P.mother_last_name AS Player_Mother_Last_Name, P.birthday AS Player_Birthday,
+        CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
+        P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
+        CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
+        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
+        INNER JOIN dbo.Team AS T ON P.id_team = T.id
+        INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
+        INNER JOIN dbo.Dependency AS D ON DS.id_dependency = D.id
+        INNER JOIN dbo.Sport AS S ON DS.id_sport = S.id
+        JOIN dbo.Event AS E ON T.id_event = E.id
+        WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
+        AND T.id = :team_id");
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->bindParam(':team_id', $team_id);
     $stm->execute();
     return $stm->fetchAll();
   }

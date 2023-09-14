@@ -63,6 +63,7 @@
                   <option value="" disabled selected>Seleccionar...</option>
                   <option value="Varonil">Varonil</option>
                   <option value="Femenil">Femenil</option>
+                  <option value="Mixto">Mixto</option>
                 </select>
                 <label for="gender">Rama</label>
               </div>

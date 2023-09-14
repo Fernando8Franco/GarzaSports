@@ -43,11 +43,6 @@
               <i class="fa-solid fa-volleyball nav_icon"></i>
               <span class="nav_name">Deportes</span>
             </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/dependenciessports/index" hx-target="#targetPHP" hx-trigger="click"
-              id="dependenciesSports_link" title="Habilitar Deportes">
-              <i class="fa-brands fa-megaport fa-lg"></i>
-              <span class="nav_name">Habilitar Deportes</span>
-            </a>
             <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/register/index" hx-target="#targetPHP" hx-trigger="click"
               id="register_link" title="Inscripciones">
               <i class="fa-solid fa-file-pen nav_icon"></i>
@@ -58,45 +53,12 @@
               <i class="fa-solid fa-people-group fa-lg nav_icon"></i>
               <span class="nav_name">Equipos</span>
             </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/players/index" hx-target="#targetPHP" hx-trigger="click"
-              title="Participantes">
-              <i class="fa-solid fa-address-book nav_icon"></i>
-              <span class="nav_name">Participantes</span>
-            </a>
           <?php endif; ?>
-
+          
           <?php if ($_SESSION['role_emp'] === 'Empleado'): ?>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/sports/dependencies/index" hx-target="#targetPHP"
-              hx-trigger="click">
-              <i class="fa-solid fa-volleyball nav_icon"></i>
-              <span class="nav_name">Deportes</span>
-            </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/records/index" hx-target="#targetPHP" hx-trigger="click">
+            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/register/registerByDependency" hx-target="#targetPHP" hx-trigger="click" id="registerByDependency_link" title="Inscripciones">
               <i class="fa-solid fa-file-pen nav_icon"></i>
               <span class="nav_name">Inscripciones</span>
-            </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/players/index" hx-target="#targetPHP" hx-trigger="click">
-              <i class="fa-solid fa-address-book nav_icon"></i>
-              <span class="nav_name">Participantes</span>
-            </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/teams/index" hx-target="#targetPHP" hx-trigger="click">
-              <i class="fa-solid fa-people-group fa-lg nav_icon"></i>
-              <span class="nav_name">Equipos</span>
-            </a>
-          <?php endif; ?>
-
-          <?php if ($_SESSION['role_emp'] === 'Visualizador'): ?>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/records/index" hx-target="#targetPHP" hx-trigger="click">
-              <i class="fa-solid fa-file-pen nav_icon"></i>
-              <span class="nav_name">Inscripciones</span>
-            </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/players/index" hx-target="#targetPHP" hx-trigger="click">
-              <i class="fa-solid fa-address-book nav_icon"></i>
-              <span class="nav_name">Participantes</span>
-            </a>
-            <a href="" class="nav_link" hx-get="<?= URL_PATH ?>/teams/index" hx-target="#targetPHP" hx-trigger="click">
-              <i class="fa-solid fa-people-group fa-lg nav_icon"></i>
-              <span class="nav_name">Equipos</span>
             </a>
           <?php endif; ?>
         </div>

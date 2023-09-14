@@ -22,7 +22,8 @@ if (!isset($_SESSION['name_s'])) {
   <link rel="stylesheet" href="<?= URL_PATH ?>/assets/fontawesome-6/css/solid.css">
   <link rel="stylesheet"
     href="<?= URL_PATH ?>/assets/datatables/css/cdn.datatables.net_1.13.6_css_dataTables.bootstrap5.min.css">
-  <link rel="stylesheet" href="<?= URL_PATH ?>/assets/datatables/css/cdn.datatables.net_buttons_2.4.1_css_buttons.dataTables.min.css">
+  <link rel="stylesheet"
+    href="<?= URL_PATH ?>/assets/datatables/css/cdn.datatables.net_buttons_2.4.1_css_buttons.dataTables.min.css">
   <link rel="stylesheet" href="<?= URL_PATH ?>/assets/sweetalert2/css/sweetalert2.min.css">
 
   <title>Panel de Control</title>
@@ -31,15 +32,21 @@ if (!isset($_SESSION['name_s'])) {
 <body id="body-pd">
   <?= $content ?>
   <!-- Scripts -->
-  <script> const URL_PATH = "<?= URL_PATH ?>"; </script>
+  <script> const URL_PATH = "<?= URL_PATH ?>"; const ID_DEPENDENCY = "<?= $_SESSION['id_dependency'] ?>";</script>
   <script src="<?= URL_PATH ?>/assets/bootstrap-5/js/bootstrap.bundle.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/js/htmx-1.9.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/code.jquery.com_jquery-3.7.0.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_jquery.dataTables.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_1.13.6_js_dataTables.bootstrap5.min.js"></script>
-  <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_dataTables.buttons.min.js"></script>
+  <script
+    src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_dataTables.buttons.min.js"></script>
   <script src="<?= URL_PATH ?>/assets/datatables/js/cdn.datatables.net_buttons_2.4.1_js_buttons.print.min.js"></script>
-  <script src="<?= URL_PATH ?>/assets/js/scripts.dashboard.js"></script>
+  <?php if ($_SESSION['role_emp'] === 'Administrador'): ?>
+    <script src="<?= URL_PATH ?>/assets/js/scripts.dashboard.js"></script>
+  <?php endif; ?>
+  <?php if ($_SESSION['role_emp'] === 'Empleado'): ?>
+    <script src="<?= URL_PATH ?>/assets/js/scripts.employee.js"></script>
+  <?php endif; ?>
   <script src="<?= URL_PATH ?>/assets/sweetalert2/js/sweetalert2.all.min.js"></script>
 </body>
 

@@ -46,16 +46,7 @@
                 required>
               <label for="name">Nombre de la dependencia</label>
             </div>
-            <div class="form-floating">
-              <select class="form-select mb-4" id="category" name="category" aria-label="Default select example" required>
-                <option value="" disabled selected>Seleccionar...</option>
-                <option value="BACHILLERATO">BACHILLERATO</option>
-                <option value="UNIVERSIDAD">UNIVERSIDAD</option>
-                <option value="ESCUELA SUPERIOR">ESCUELA SUPERIOR</option>
-                <option value="POSGRADO">POSGRADO</option>
-              </select>
-              <label for="category">Categoria</label>
-            </div>
+            <input type="hidden" name="category" id="category" value="DEPENDENCIA">
           </div>
           <div class="modal-footer justify-content-center">
             <button type="submit" name="action" id="action" class="btn btn-danger btn-lg">

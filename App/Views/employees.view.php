@@ -87,7 +87,6 @@
               <div class="form-floating col-6">
                 <select class="form-select mb-4" id="role_emp" name="role_emp" aria-label="Default select example">
                   <option value="Empleado">Empleado</option>
-                  <option value="Visualizador">Visualizador</option>
                   <option value="Administrador">Administrador</option>
                 </select>
                 <label for="role_emp">Rol del empleado</label>

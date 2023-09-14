@@ -7,12 +7,6 @@
 <button id="editRegister" type="button" class="d-none"></button>
 <button id="deleteRegister" type="button" class="d-none"></button>
 <div class="container table-responsive pt-2">
-  <div class="form-floating">
-    <select class="form-select mb-4" id="dependency" name="dependency" aria-label="Default select example" required>
-      <option value="" disabled selected>Seleccionar...</option>
-    </select>
-    <label for="dependency">Depenencia</label>
-  </div>
   <table id="datatable" class="table table-bordered table-striped" style="width:100%">
     <thead>
       <tr>

@@ -19,6 +19,12 @@
 .btn-secondary {
   background-color: var(--darkgrey) !important;
 }
+.btn-info {
+  background-color: #1C95FA !important;
+}
 .bg-info {
-  background-color: var(--cream) !important;
+  background-color: #1C95FA !important;
+}
+.intern-container {
+  width: 90% !important;
 }

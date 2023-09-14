@@ -35,25 +35,44 @@ class RegisterController extends Controller
     }
   }
 
+  public function registerByDependency()
+  {
+    if ($_SESSION['role_emp'] == 'Empleado') {
+      $this->renderView('registerByDependency');
+    }
+  }
+
   public function registerCRUD()
   {
-
-    $data = [
-      'id' => $_POST['id'] ?? '',
-      'no_employee' => $_POST['no_employee'] ?? '',
-      'id_dependency' => $_POST['id_dependency'] ?? '',
-      'name_s' => $_POST['name_s'] ?? '',
-      'father_last_name' => $_POST['father_last_name'] ?? '',
-      'mother_last_name' => $_POST['mother_last_name'] ?? '',
-      'role_emp' => $_POST['role_emp'] ?? '',
-      'is_active' => $_POST['is_active'] ?? ''
-    ];
-
     $option = $_POST['option'] ?? '';
+    $id_dependency = $_POST['id_dependency'] ?? '';
 
     switch ($option) {
       case 4:
-        $registers = $this->teamModel->getRegister();
+        if($id_dependency == "-1") {
+          $registers = $this->teamModel->getRegister();
+        } else {
+          $registers = $this->teamModel->getRegisterByDependency($id_dependency);
+        }
+        break;
+    }
+
+    foreach ($registers as &$register) {
+      $register['Player_Birthday'] = $this->calculateAge($register['Player_Birthday']);
+      $register['Record_Date'] = strtr($register['Record_Date'], $this->spanishMonthNames);
+    }
+
+    echo json_encode($registers, JSON_UNESCAPED_UNICODE);
+  }
+
+  public function registerByDependencyCRUD()
+  {
+    $option = $_POST['option'] ?? '';
+    $id_dependency = $_POST['id_dependency'] ?? '';
+
+    switch ($option) {
+      case 4:
+        $registers = $this->teamModel->getRegisterByDependency($id_dependency);
         break;
     }
 
@@ -67,7 +86,15 @@ class RegisterController extends Controller
 
   public function registersData() {
     $registerData = $this->teamModel->getCount('team', 'player');
-    echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
+    if($registerData){
+      echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
+    } else {
+      $defaultRecord = [
+        'rows_team' => '0',
+        'rows_player' => '0',
+      ];
+      echo json_encode($defaultRecord, JSON_UNESCAPED_UNICODE);
+    }
   }
 
   public function internRegister()
@@ -141,10 +168,35 @@ class RegisterController extends Controller
       }
 
       $this->con->commit();
+
+      $register = $this->teamModel->getRegisterByTeam($id_team);
+      echo json_encode($register, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
       // En caso de error, revertir la transacción
       $this->con->rollback();
-      echo "Error: " . $e->getMessage();
+      //echo "Error: " . $e->getMessage();
+      $defaultRecord = [
+        'Player_ID' => 'NO REGISTRADO',
+        'Player_Account_Number' => 'NO REGISTRADO',
+        'Player_Name' => 'NO REGISTRADO',
+        'Player_Father_Last_Name' => 'NO REGISTRADO',
+        'Player_Mother_Last_Name' => 'NO REGISTRADO',
+        'Player_Birthday' => 'NO REGISTRADO',
+        'Player_Gender' => 'NO REGISTRADO',
+        'Player_Phone_Number' => 'NO REGISTRADO',
+        'Player_Email' => 'NO REGISTRADO',
+        'Player_Semester' => 'NO REGISTRADO',
+        'Player_Group_Number' => 'NO REGISTRADO',
+        'Player_Photo' => 'NO REGISTRADO',
+        'Player_Is_Captain' => 'NO REGISTRADO',
+        'Dependency_Name' => 'NO REGISTRADO',
+        'Sport_Name' => 'NO REGISTRADO',
+        'Sport_Gender' => 'NO REGISTRADO',
+        'Team_Name' => 'NO REGISTRADO',
+        'Record_Date' => 'NO REGISTRADO',
+      ];
+      $register = array($defaultRecord);
+      echo json_encode($register, JSON_UNESCAPED_UNICODE);
     }
   }
   private function calculateAge($birthday)

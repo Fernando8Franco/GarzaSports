@@ -103,7 +103,7 @@ const dataTableConfig = {
   ],
 };
 
-const initDataTable = async (table, columns) => {
+const initDataTable = async (table, columns, id_dependency) => {
   try {
     if (dataTableIsInitialized) {
       dataTable.destroy();
@@ -141,7 +141,7 @@ const initDataTable = async (table, columns) => {
         ajax: {
           url: URL_PATH + "/" + table + "/" + table + "CRUD",
           method: "POST",
-          data: { option: option },
+          data: { option: option, id_dependency: id_dependency},
           dataSrc: "",
         },
         columns: columns,
@@ -245,6 +245,19 @@ async function fetchEventDates() {
     });
 }
 
+async function fetchGetDependencies() {
+  const url = `${URL_PATH}/dependencies/getDependenciesWithAll`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
 async function fetchRegisters() {
   const url = `${URL_PATH}/register/registersData`;
 
@@ -325,139 +338,290 @@ const createCrudTable = (
   document
     .getElementById(`${TABLE}_link`)
     .addEventListener("htmx:afterOnLoad", async function () {
-      await initDataTable(TABLE, COLUMNS);
+      if (TABLE == "registerByDependency") {
+        TABLE = "register";
+      }
+      if (TABLE == "register") {
+        const dependencySelect = document.getElementById("dependency");
 
-      const form = document.getElementById(FORM_NAME);
-      const submitButton = form.querySelector("#action");
+        const fetchPromiseGetDependencies = fetchGetDependencies();
+        fetchPromiseGetDependencies.then((data) => {
+          dependencySelect.innerHTML = data;
+        });
 
-      const hideModal = () => {
-        const myModal = bootstrap.Modal.getOrCreateInstance(
-          document.getElementById(MODAL_NAME)
-        );
-        myModal.hide();
-      };
+        dependencySelect.addEventListener("change", async function () {
+          await initDataTable(TABLE, COLUMNS, dependencySelect.value);
+          const form = document.getElementById(FORM_NAME);
+          const submitButton = form.querySelector("#action");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+          const hideModal = () => {
+            const myModal = bootstrap.Modal.getOrCreateInstance(
+              document.getElementById(MODAL_NAME)
+            );
+            myModal.hide();
+          };
 
-        if (TABLE == "events" && !validateForm()) {
-          return;
-        }
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        submitButton.disabled = true;
-        hideModal();
+            if (TABLE == "events" && !validateForm()) {
+              return;
+            }
 
-        const formData = new FormData(form);
-        formData.append("option", option);
+            submitButton.disabled = true;
+            hideModal();
 
-        try {
-          const response = await fetch(`${URL_PATH}/${TABLE}/${CRUDNAME}`, {
-            method: "POST",
-            body: formData,
-          });
+            const formData = new FormData(form);
+            formData.append("option", option);
 
-          if (response.ok) {
-            const data = await response.json();
-            dataTable.ajax.reload(null, false);
-          } else {
-            console.error("Error:", response.statusText);
-            alert("No se pudo completar la operación.");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("No se pudo completar la operación.");
-        }
+            try {
+              const response = await fetch(`${URL_PATH}/${TABLE}/${CRUDNAME}`, {
+                method: "POST",
+                body: formData,
+              });
 
-        submitButton.disabled = false;
-      });
-
-      document.getElementById(BTN_ID).addEventListener("click", function () {
-        if (BTN_ID == "addEmployee") {
-          document.getElementById("password").type = "password";
-          document.querySelector('label[for="password"]').className = "";
-          document.getElementById("div_on_employee").className =
-            "form-floating col-6";
-          document.getElementById("div_acc_pass").className = "row g-2";
-        }
-        document.querySelector(".modal-title").textContent = MODAL_TITLE_ADD;
-        document.getElementById("action").textContent = "Agregar";
-
-        option = 1;
-        idEvent = null;
-        form.reset();
-      });
-
-      document.addEventListener("click", function (e) {
-        if (e.target && e.target.classList.contains(BTN_EDIT)) {
-          if (BTN_EDIT == "editBtnEmployee") {
-            document.getElementById("password").type = "hidden";
-            document.querySelector('label[for="password"]').className =
-              "d-none";
-            document.getElementById("div_on_employee").className =
-              "form-floating col-12";
-            document.getElementById("div_acc_pass").className = "";
-          }
-          document.querySelector(".modal-title").textContent = MODAL_TITLE_EDIT;
-          document.getElementById("action").innerHTML = "Editar";
-
-          option = 2;
-          const row = e.target.closest("tr");
-          const rowData = dataTable.row(row).data();
-          formDataCallback(rowData);
-        }
-      });
-
-      document.addEventListener("click", async function (e) {
-        if (e.target && e.target.classList.contains(BTN_DELETE)) {
-          option = 3;
-
-          const row = e.target.closest("tr");
-          const rowData = dataTable.row(row).data();
-          const id = parseInt(rowData.id);
-
-          Swal.fire({
-            title: "¿Está seguro?",
-            text: "No podra volver a recuperar esta infomación",
-            icon: "warning",
-            showCancelButton: true,
-            cancelButtonText: "Cancelar",
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, estoy seguro!",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const formDataDelete = new FormData();
-              formDataDelete.append("id", id);
-              formDataDelete.append("option", option);
-              try {
-                const response = await fetch(
-                  `${URL_PATH}/${TABLE}/${CRUDNAME}`,
-                  {
-                    method: "POST",
-                    body: formDataDelete,
-                  }
-                );
-
-                if (response.ok) {
-                  const data = await response.json();
-                  dataTable.ajax.reload(null, false);
-                } else {
-                  console.error("Error:", response.statusText);
-                  alert("No se pudo completar la operación.");
-                }
-              } catch (error) {
-                console.error("Error:", error);
+              if (response.ok) {
+                const data = await response.json();
+                dataTable.ajax.reload(null, false);
+              } else {
+                console.error("Error:", response.statusText);
                 alert("No se pudo completar la operación.");
               }
-              Swal.fire(
-                "¡Eliminado!",
-                "Elemento eliminado correctamente.",
-                "success"
-              );
+            } catch (error) {
+              console.error("Error:", error);
+              alert("No se pudo completar la operación.");
+            }
+
+            submitButton.disabled = false;
+          });
+
+          document
+            .getElementById(BTN_ID)
+            .addEventListener("click", function () {
+              if (BTN_ID == "addEmployee") {
+                document.getElementById("password").type = "password";
+                document.querySelector('label[for="password"]').className = "";
+                document.getElementById("div_on_employee").className =
+                  "form-floating col-6";
+                document.getElementById("div_acc_pass").className = "row g-2";
+              }
+              document.querySelector(".modal-title").textContent =
+                MODAL_TITLE_ADD;
+              document.getElementById("action").textContent = "Agregar";
+
+              option = 1;
+              idEvent = null;
+              form.reset();
+            });
+
+          document.addEventListener("click", function (e) {
+            if (e.target && e.target.classList.contains(BTN_EDIT)) {
+              if (BTN_EDIT == "editBtnEmployee") {
+                document.getElementById("password").type = "hidden";
+                document.querySelector('label[for="password"]').className =
+                  "d-none";
+                document.getElementById("div_on_employee").className =
+                  "form-floating col-12";
+                document.getElementById("div_acc_pass").className = "";
+              }
+              document.querySelector(".modal-title").textContent =
+                MODAL_TITLE_EDIT;
+              document.getElementById("action").innerHTML = "Editar";
+
+              option = 2;
+              const row = e.target.closest("tr");
+              const rowData = dataTable.row(row).data();
+              formDataCallback(rowData);
             }
           });
-        }
-      });
+
+          document.addEventListener("click", async function (e) {
+            if (e.target && e.target.classList.contains(BTN_DELETE)) {
+              option = 3;
+
+              const row = e.target.closest("tr");
+              const rowData = dataTable.row(row).data();
+              const id = parseInt(rowData.id);
+
+              Swal.fire({
+                title: "¿Está seguro?",
+                text: "No podra volver a recuperar esta infomación",
+                icon: "warning",
+                showCancelButton: true,
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, estoy seguro!",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const formDataDelete = new FormData();
+                  formDataDelete.append("id", id);
+                  formDataDelete.append("option", option);
+                  try {
+                    const response = await fetch(
+                      `${URL_PATH}/${TABLE}/${CRUDNAME}`,
+                      {
+                        method: "POST",
+                        body: formDataDelete,
+                      }
+                    );
+
+                    if (response.ok) {
+                      const data = await response.json();
+                      dataTable.ajax.reload(null, false);
+                    } else {
+                      console.error("Error:", response.statusText);
+                      alert("No se pudo completar la operación.");
+                    }
+                  } catch (error) {
+                    console.error("Error:", error);
+                    alert("No se pudo completar la operación.");
+                  }
+                  Swal.fire(
+                    "¡Eliminado!",
+                    "Elemento eliminado correctamente.",
+                    "success"
+                  );
+                }
+              });
+            }
+          });
+        });
+      } else {
+        await initDataTable(TABLE, COLUMNS);
+        const form = document.getElementById(FORM_NAME);
+        const submitButton = form.querySelector("#action");
+
+        const hideModal = () => {
+          const myModal = bootstrap.Modal.getOrCreateInstance(
+            document.getElementById(MODAL_NAME)
+          );
+          myModal.hide();
+        };
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          if (TABLE == "events" && !validateForm()) {
+            return;
+          }
+
+          submitButton.disabled = true;
+          hideModal();
+
+          const formData = new FormData(form);
+          formData.append("option", option);
+
+          try {
+            const response = await fetch(`${URL_PATH}/${TABLE}/${CRUDNAME}`, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              dataTable.ajax.reload(null, false);
+            } else {
+              console.error("Error:", response.statusText);
+              alert("No se pudo completar la operación.");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("No se pudo completar la operación.");
+          }
+
+          submitButton.disabled = false;
+        });
+
+        document.getElementById(BTN_ID).addEventListener("click", function () {
+          if (BTN_ID == "addEmployee") {
+            document.getElementById("password").type = "password";
+            document.querySelector('label[for="password"]').className = "";
+            document.getElementById("div_on_employee").className =
+              "form-floating col-6";
+            document.getElementById("div_acc_pass").className = "row g-2";
+          }
+          document.querySelector(".modal-title").textContent = MODAL_TITLE_ADD;
+          document.getElementById("action").textContent = "Agregar";
+
+          option = 1;
+          idEvent = null;
+          form.reset();
+        });
+
+        document.addEventListener("click", function (e) {
+          if (e.target && e.target.classList.contains(BTN_EDIT)) {
+            if (BTN_EDIT == "editBtnEmployee") {
+              document.getElementById("password").type = "hidden";
+              document.querySelector('label[for="password"]').className =
+                "d-none";
+              document.getElementById("div_on_employee").className =
+                "form-floating col-12";
+              document.getElementById("div_acc_pass").className = "";
+            }
+            document.querySelector(".modal-title").textContent =
+              MODAL_TITLE_EDIT;
+            document.getElementById("action").innerHTML = "Editar";
+
+            option = 2;
+            const row = e.target.closest("tr");
+            const rowData = dataTable.row(row).data();
+            formDataCallback(rowData);
+          }
+        });
+
+        document.addEventListener("click", async function (e) {
+          if (e.target && e.target.classList.contains(BTN_DELETE)) {
+            option = 3;
+
+            const row = e.target.closest("tr");
+            const rowData = dataTable.row(row).data();
+            const id = parseInt(rowData.id);
+
+            Swal.fire({
+              title: "¿Está seguro?",
+              text: "No podra volver a recuperar esta infomación",
+              icon: "warning",
+              showCancelButton: true,
+              cancelButtonText: "Cancelar",
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Sí, estoy seguro!",
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                const formDataDelete = new FormData();
+                formDataDelete.append("id", id);
+                formDataDelete.append("option", option);
+                try {
+                  const response = await fetch(
+                    `${URL_PATH}/${TABLE}/${CRUDNAME}`,
+                    {
+                      method: "POST",
+                      body: formDataDelete,
+                    }
+                  );
+
+                  if (response.ok) {
+                    const data = await response.json();
+                    dataTable.ajax.reload(null, false);
+                  } else {
+                    console.error("Error:", response.statusText);
+                    alert("No se pudo completar la operación.");
+                  }
+                } catch (error) {
+                  console.error("Error:", error);
+                  alert("No se pudo completar la operación.");
+                }
+                Swal.fire(
+                  "¡Eliminado!",
+                  "Elemento eliminado correctamente.",
+                  "success"
+                );
+              }
+            });
+          }
+        });
+      }
     });
 };
 
@@ -506,7 +670,7 @@ createCrudTable(
   [
     { data: "id", visible: false },
     { data: "name" },
-    { data: "category" },
+    { data: "category", visible: false },
     {
       defaultContent:
         "<div class='text-center'><button class='btn btn-primary btn-sm editBtnDependency' data-bs-toggle='modal' data-bs-target='#modalDependency'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnDependency'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
@@ -735,46 +899,4 @@ createCrudTable(
   "editRegister",
   "deleteRegister",
   (rowData) => {}
-);
-
-createCrudTable(
-  "dependenciesSports",
-  "sportsCRUD",
-  [
-    { data: "id", visible: false },
-    { data: "name" },
-    { data: "type" },
-    { data: "gender" },
-    { data: "num_players" },
-    { data: "num_extraplayers" },
-    { data: "has_captain" },
-    {
-      defaultContent:
-        "<div class='text-center'><button class='btn btn-primary btn-sm editBtnSport' data-bs-toggle='modal' data-bs-target='#modalSport'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnSport'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
-    },
-  ],
-  "sportForm",
-  "modalSport",
-  "addSport",
-  "Agregar Deporte",
-  "Editar Deporte",
-  "editBtnSport",
-  "deleteBtnSport",
-  (rowData) => {
-    var id = parseInt(rowData.id);
-    var name = rowData.name;
-    var type = rowData.type;
-    var gender = rowData.gender;
-    var num_players = rowData.num_players;
-    var num_extraplayers = rowData.num_extraplayers;
-    var has_captain = rowData.has_captain;
-
-    document.getElementById("id").value = id;
-    document.getElementById("name").value = name;
-    document.getElementById("type").value = type;
-    document.getElementById("gender").value = gender;
-    document.getElementById("num_players").value = num_players;
-    document.getElementById("num_extraplayers").value = num_extraplayers;
-    document.getElementById("has_captain").value = has_captain;
-  }
 );

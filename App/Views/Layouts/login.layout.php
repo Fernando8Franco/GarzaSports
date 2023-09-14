@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="<?= URL_PATH ?>/assets/sweetalert2/css/sweetalert2.min.css">
 
     
-    <title><?= $pageName ?></title>
+    <title>Acceso Administrador</title>
 </head>
     <body>
         <?= $content ?>

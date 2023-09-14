@@ -16,9 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-enable pdo_sqlsrv
 
 RUN a2enmod rewrite
-
-COPY ./ /var/www/html
-
+RUN a2enmod headers
 RUN service apache2 restart
 
 EXPOSE 80

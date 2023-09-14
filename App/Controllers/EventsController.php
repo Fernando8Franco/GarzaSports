@@ -79,29 +79,23 @@ class EventsController extends Controller
 
   public function eventsDates()
   {
-    if (/*isset($_SESSION['role_emp')*/true) {
-      $events = $this->eventModel->getEvent();
+    $events = $this->eventModel->getEvent();
 
-      if ($events > 0) {
-        $events['start_date'] = strtr($events['start_date'], $this->spanishMonthNames);
-        $events['end_date'] = strtr($events['end_date'], $this->spanishMonthNames);
-        $events['ins_start_date'] = strtr($events['ins_start_date'], $this->spanishMonthNames);
-        $events['ins_end_date'] = strtr($events['ins_end_date'], $this->spanishMonthNames);
+    if ($events > 0) {
+      $events['start_date'] = strtr($events['start_date'], $this->spanishMonthNames);
+      $events['end_date'] = strtr($events['end_date'], $this->spanishMonthNames);
 
-        echo json_encode($events, JSON_UNESCAPED_UNICODE);
-      } else {
-        $events = [
-          [
-            "id" => 0,
-            "name" => "GarzaSports - Ingresar Evento",
-            "start_date" => "Sin definir",
-            "end_date" => "Sin definir",
-            "inst_start_date" => "Sin definir",
-            "inst_end_date" => "Sin definir"
-          ]
-        ];
-        echo json_encode($events, JSON_UNESCAPED_UNICODE);
-      }
+      echo json_encode($events, JSON_UNESCAPED_UNICODE);
+    } else {
+      $events = [
+        "id" => 0,
+        "name" => "GarzaSports - Ingresar Evento",
+        "start_date" => "Sin definir",
+        "end_date" => "Sin definir",
+        "inst_start_date" => "Sin definir",
+        "inst_end_date" => "Sin definir"
+      ];
+      echo json_encode($events, JSON_UNESCAPED_UNICODE);
     }
   }
 }

@@ -10,6 +10,12 @@
   <div class="container bg-white rounded py-5 intern-container">
     <section>
       <div class="form-floating">
+        <select class="form-select mb-4" id="category" name="category" aria-label="Default select example" required>
+          <option value="" disabled selected>Seleccionar...</option>
+        </select>
+        <label for="dependency">Categoria</label>
+      </div>
+      <div class="form-floating">
         <select class="form-select mb-4" id="dependency" name="dependency" aria-label="Default select example" required>
           <option value="" disabled selected>Seleccionar...</option>
         </select>

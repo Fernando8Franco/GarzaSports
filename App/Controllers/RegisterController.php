@@ -68,10 +68,10 @@ class RegisterController extends Controller
   public function registerByDependencyCRUD()
   {
     $option = $_POST['option'] ?? '';
-    $id_dependency = $_POST['id_dependency'] ?? '';
 
     switch ($option) {
       case 4:
+        $id_dependency = $_SESSION['id_dependency'];
         $registers = $this->teamModel->getRegisterByDependency($id_dependency);
         break;
     }
@@ -86,7 +86,14 @@ class RegisterController extends Controller
 
   public function registersData()
   {
-    $registerData = $this->teamModel->getCount('team', 'player');
+
+    if ($_SESSION['role_emp'] == 'Administrador') {
+      $registerData = $this->teamModel->getCount('team', 'player');
+    } else if ($_SESSION['role_emp'] == 'Empleado') {
+      $id_dependency = $_SESSION['id_dependency'];
+      $registerData = $this->teamModel->getCountByDependency('team', 'player', $id_dependency);
+    }
+    
     if ($registerData) {
       echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
     } else {

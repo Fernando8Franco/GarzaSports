@@ -1,16 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  function areSelectsSelected() {
-    return (
-      dependencySelect.value !== "" &&
-      sportSelect.value !== "" &&
-      branchSelect.value != ""
-    );
-  }
-  const dependencySelect = document.getElementById("dependency");
-  const sportSelect = document.getElementById("sport");
-  const branchSelect = document.getElementById("branch");
-  const formContainer = document.getElementById("form-container");
-
   const fetchPromise = fetchEventDates();
   fetchPromise.then((data) => {
     const eventName = data.name;
@@ -18,9 +6,26 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("eventName").textContent = "Registro " + eventName;
   });
 
-  const fetchPromiseGetDependencies = fetchGetDependencies();
+  function areSelectsSelected() {
+    return (
+      categorySelect.value !== "" &&
+      dependencySelect.value !== "" &&
+      sportSelect.value !== "" &&
+      branchSelect.value != ""
+    );
+  }
+
+  const categorySelect = document.getElementById("category");
+  const dependencySelect = document.getElementById("dependency");
+  const sportSelect = document.getElementById("sport");
+  const branchSelect = document.getElementById("branch");
+  const formContainer = document.getElementById("form-container");
+
+  const fetchPromiseGetDependencies = fetchGetCategories();
   fetchPromiseGetDependencies.then((data) => {
-    dependencySelect.innerHTML = data;
+    categorySelect.innerHTML = data;
+    dependencySelect.innerHTML =
+      '<option value="" disabled selected>Seleccionar...</option>';
     branchSelect.innerHTML =
       '<option value="" disabled selected>Seleccionar...</option>';
     sportSelect.innerHTML =
@@ -28,10 +33,41 @@ document.addEventListener("DOMContentLoaded", function () {
     formContainer.innerHTML = "";
   });
 
+  categorySelect.addEventListener("change", function () {
+    const selectedCategory = categorySelect.value;
+
+    const dataToSend = {
+      category: selectedCategory,
+    };
+
+    const apiUrl = `${URL_PATH}/dependencies/getDependenciesByCategory`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend),
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then((response) => response.text()) // Parseamos la respuesta JSON
+      .then((data) => {
+        dependencySelect.innerHTML = data;
+        branchSelect.innerHTML =
+          '<option value="" disabled selected>Seleccionar...</option>';
+        sportSelect.innerHTML =
+          '<option value="" disabled selected>Seleccionar...</option>';
+        formContainer.innerHTML = "";
+      })
+      .catch((error) => {
+        console.error("Error al hacer la solicitud:", error);
+      });
+  });
+
   dependencySelect.addEventListener("change", function () {
     const selectedDependency = dependencySelect.value;
 
-    // Realizar la solicitud AJAX para cargar los deportes basados en la dependencia seleccionada
     const dataToSend = {
       dependency: selectedDependency,
     };
@@ -214,7 +250,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (result.isConfirmed) {
                       submitButton.disabled = false;
                       formContainer.innerHTML = "";
-                      dependencySelect.value = "";
+                      categorySelect.value = "";
+                      dependencySelect.innerHTML =
+                        '<option value="" disabled selected>Seleccionar...</option>';
                       branchSelect.innerHTML =
                         '<option value="" disabled selected>Seleccionar...</option>';
                       sportSelect.innerHTML =
@@ -433,7 +471,7 @@ function initializeCroppie(
         if (croppieInstance) {
           croppieInstance.destroy();
         }
-        
+
         croppieInstance = new Croppie(croppieContainer, {
           viewport: { width: 200, height: 200, type: "square" },
           boundary: { width: 300, height: 300 },
@@ -503,6 +541,19 @@ async function fetchEventDates() {
 
 async function fetchGetDependencies() {
   const url = `${URL_PATH}/dependencies/getDependencies`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+async function fetchGetCategories() {
+  const url = `${URL_PATH}/dependencies/getCategories`;
 
   return fetch(url, {
     method: "GET",

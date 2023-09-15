@@ -222,7 +222,7 @@ class Orm
   ////////////////////////////////////////////////////////////////////////////////////
   public function getCategories()
   {
-    $stm = $this->db->prepare("SELECT DISTINCT category FROM {$this->table}");
+    $stm = $this->db->prepare("SELECT DISTINCT category FROM {$this->table} ORDER BY category");
     $stm->execute();
     return $stm->fetchAll();
   }
@@ -232,7 +232,7 @@ class Orm
   ////////////////////////////////////////////////////////////////////////////////////
   public function getDependenciesByCategory($category)
   {
-    $stm = $this->db->prepare("SELECT id, name FROM {$this->table} WHERE category = :category");
+    $stm = $this->db->prepare("SELECT id, name FROM {$this->table} WHERE category = :category ORDER BY name");
     $stm->bindParam(':category', $category);
     $stm->execute();
     return $stm->fetchAll();
@@ -300,7 +300,7 @@ class Orm
         CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
         P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
         CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
-        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        D.name AS Dependency_Name, D.category AS Dependency_Category, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
         CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
         INNER JOIN dbo.Team AS T ON P.id_team = T.id
         INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
@@ -322,7 +322,7 @@ class Orm
         CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
         P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
         CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
-        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        D.name AS Dependency_Name, D.category AS Dependency_Category, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
         CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
         INNER JOIN dbo.Team AS T ON P.id_team = T.id
         INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
@@ -332,7 +332,7 @@ class Orm
         WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
         AND D.id = :id_dependency");
     $stm->bindParam(':target_date', $actualDate);
-    $stm->bindParam(':id_dependency', $id_dependency);
+    $stm->bindParam(':id_dependency', $id_dependency, PDO::PARAM_INT);
     $stm->execute();
     return $stm->fetchAll();
   }
@@ -347,6 +347,24 @@ class Orm
         FROM dbo.Event AS E
         WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date");
     $stm->bindParam(':target_date', $actualDate);
+    $stm->execute();
+    return $stm->fetch();
+  }
+
+  public function getCountByDependency($tableName1, $tableName2, $id_dependency)
+  {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $stm = $this->db->prepare("SELECT (SELECT COUNT(*) FROM $tableName1 AS T
+        INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id
+        WHERE DS.id_dependency = :id_dependency1) AS rows_$tableName1,
+        (SELECT COUNT(*) FROM $tableName2 AS P
+        WHERE P.id_dependency = :id_dependency2) AS rows_$tableName2
+      FROM dbo.Event AS E
+      WHERE CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date");
+    $stm->bindParam(':target_date', $actualDate);
+    $stm->bindParam(':id_dependency1', $id_dependency, PDO::PARAM_INT);
+    $stm->bindParam(':id_dependency2', $id_dependency, PDO::PARAM_INT);
     $stm->execute();
     return $stm->fetch();
   }
@@ -377,7 +395,7 @@ class Orm
     return $stm->fetch();
   }
 
-  public function getTeamByAccEmailDependencyGenderSport($acc_number, $email, $dependency, $gender, $sport)
+  public function getTeamByAccEmailDependencySport($acc_number, $email, $dependency, $sport)
   {
     date_default_timezone_set("America/Mexico_City");
     $actualDate = date("Y-m-d");
@@ -385,17 +403,15 @@ class Orm
     FROM {$this->table} T
     INNER JOIN dbo.Player P ON T.id = P.id_team
     JOIN dbo.Event AS E ON CONVERT(DATE, :target_date) BETWEEN E.start_date AND E.end_date
-    JOIN dbo.Dependency_Sport DS ON P.id_dependency = DS.id_dependency
+    JOIN dbo.Dependency_Sport DS ON T.id_dependency_sport = DS.id
     JOIN dbo.Sport S ON DS.id_sport = S.id
     WHERE P.acc_number = :acc_number 
     AND P.email = :email 
-    AND DS.id_dependency = :dependency 
-    AND S.gender = :gender 
+    AND DS.id_dependency = :dependency
     AND S.id = :sport");
     $stm->bindParam(':acc_number', $acc_number, PDO::PARAM_STR);
     $stm->bindParam(':email', $email, PDO::PARAM_STR);
     $stm->bindParam(':dependency', $dependency, PDO::PARAM_INT);
-    $stm->bindParam(':gender', $gender, PDO::PARAM_STR);
     $stm->bindParam(':sport', $sport, PDO::PARAM_STR);
     $stm->bindParam(':target_date', $actualDate);
     $stm->execute();
@@ -413,7 +429,7 @@ class Orm
         CASE WHEN P.gender = 'Hombre' THEN 'H' WHEN P.gender = 'Mujer' THEN 'M' END AS Player_Gender, P.phone_number AS Player_Phone_Number,
         P.email AS Player_Email, P.semester AS Player_Semester, P.group_num AS Player_Group_Number, P.photo AS Player_Photo,
         CASE WHEN P.is_captain = 0 THEN 'JUGADOR' WHEN P.is_captain = 1 THEN 'CAPITAN' END AS Player_Is_Captain,
-        D.name AS Dependency_Name, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
+        D.name AS Dependency_Name, D.category AS Dependency_Category, S.name AS Sport_Name, S.gender AS Sport_Gender, T.name AS Team_Name,
         CONVERT(VARCHAR(11), T.record_date, 106) AS Record_Date FROM dbo.Player AS P
         INNER JOIN dbo.Team AS T ON P.id_team = T.id
         INNER JOIN dbo.Dependency_Sport AS DS ON T.id_dependency_sport = DS.id

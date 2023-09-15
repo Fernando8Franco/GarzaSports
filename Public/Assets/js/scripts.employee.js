@@ -111,7 +111,6 @@ const initDataTable = async (table, columns, crudname) => {
 
     var option;
     option = 4;
-    id_dependency = ID_DEPENDENCY;
 
     dataTable = new DataTable("#datatable", {
       ...dataTableConfig,
@@ -119,7 +118,7 @@ const initDataTable = async (table, columns, crudname) => {
       ajax: {
         url: URL_PATH + "/" + table + "/" + crudname,
         method: "POST",
-        data: { option: option, id_dependency: id_dependency },
+        data: { option: option},
         dataSrc: "",
       },
       columns: columns,

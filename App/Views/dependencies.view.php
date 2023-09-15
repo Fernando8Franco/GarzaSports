@@ -46,7 +46,15 @@
                 required>
               <label for="name">Nombre de la dependencia</label>
             </div>
-            <input type="hidden" name="category" id="category" value="DEPENDENCIA">
+            <div class="form-floating">
+              <select class="form-select mb-4" name="category" id="category" aria-label="Default select example" required>
+                <option value="" disabled selected>Seleccionar...</option>
+                <option value="BACHILLERATO">BACHILLERATO</option>
+                <option value="LICENCIATURA">LICENCIATURA</option>
+              </select>
+              <label for="dependency">Dependencia</label>
+            </div>
+            <!-- <input type="hidden" name="category" id="category" value="DEPENDENCIA"> -->
           </div>
           <div class="modal-footer justify-content-center">
             <button type="submit" name="action" id="action" class="btn btn-danger btn-lg">

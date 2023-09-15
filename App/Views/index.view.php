@@ -3,7 +3,7 @@
     <i class="fa-solid fa-address-card" style="font-size: 20px;"></i>
   </button>
 </div>
-<div class="container my-5 text-center">
+<div class="container my-3 text-center">
   <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom border-4 border-dark">
       <span class="fw-bold text-white event_name" id="eventName"></span>

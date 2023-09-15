@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const adminBtn = document.getElementById("adminBtn")
   adminBtn.addEventListener("click", function() {
-    window.location.href = URL_PATH + "/admin";
+    window.open(URL_PATH + "/admin", "_blank");
   });
 
   const fetchPromise = fetchEventDates();

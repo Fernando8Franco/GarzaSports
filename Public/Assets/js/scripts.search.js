@@ -3,22 +3,60 @@ document.addEventListener("DOMContentLoaded", function () {
   const dataTableContainer = document.getElementById("container");
   function areSelectsSelected() {
     return (
+      categorySelect.value !== "" &&
       dependencySelect.value !== "" &&
       sportSelect.value !== "" &&
       branchSelect.value != ""
     );
   }
+
+  const categorySelect = document.getElementById("category");
   const dependencySelect = document.getElementById("dependency");
   const sportSelect = document.getElementById("sport");
   const branchSelect = document.getElementById("branch");
 
-  const fetchPromiseGetDependencies = fetchGetDependencies();
+  const fetchPromiseGetDependencies = fetchGetCategories();
   fetchPromiseGetDependencies.then((data) => {
-    dependencySelect.innerHTML = data;
+    categorySelect.innerHTML = data;
+    dependencySelect.innerHTML =
+      '<option value="" disabled selected>Seleccionar...</option>';
     branchSelect.innerHTML =
       '<option value="" disabled selected>Seleccionar...</option>';
     sportSelect.innerHTML =
       '<option value="" disabled selected>Seleccionar...</option>';
+    dataTableContainer.style.display = "none";
+  });
+
+  categorySelect.addEventListener("change", function () {
+    const selectedCategory = categorySelect.value;
+
+    const dataToSend = {
+      category: selectedCategory,
+    };
+
+    const apiUrl = `${URL_PATH}/dependencies/getDependenciesByCategory`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend),
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then((response) => response.text()) // Parseamos la respuesta JSON
+      .then((data) => {
+        dependencySelect.innerHTML = data;
+        branchSelect.innerHTML =
+          '<option value="" disabled selected>Seleccionar...</option>';
+        sportSelect.innerHTML =
+          '<option value="" disabled selected>Seleccionar...</option>';
+        dataTableContainer.style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Error al hacer la solicitud:", error);
+      });
   });
 
   dependencySelect.addEventListener("change", function () {
@@ -46,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         branchSelect.innerHTML = data;
         sportSelect.innerHTML =
           '<option value="" disabled selected>Seleccionar...</option>';
+        dataTableContainer.style.display = "none";
       })
       .catch((error) => {
         console.error("Error al hacer la solicitud:", error);
@@ -77,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.text()) // Parseamos la respuesta JSON
       .then((data) => {
         sportSelect.innerHTML = data;
+        dataTableContainer.style.display = "none";
       })
       .catch((error) => {
         console.error("Error al hacer la solicitud:", error);
@@ -89,25 +129,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-    
+
         const formData = new FormData(form);
-        // formData.forEach((valor, clave) => {
-        //   console.log(clave, valor);
-        // });
-        
+
         try {
           const response = await fetch(`${URL_PATH}/teams/getTeam`, {
             method: "POST",
             body: formData,
           });
-    
+
           if (response.ok) {
             const data = await response.json();
-            if(data[0]['Player_ID'] == "NO REGISTRADO") {
+            if (data[0]["Player_ID"] == "NO REGISTRADO") {
               Swal.fire({
-                icon: 'error',
-                title: 'No se encontro el registro',
-                text: 'El número de cuenta o correo no se encuentran en los registros'
+                icon: "error",
+                title: "No se encontro el registro",
+                text: "El número de cuenta o correo no se encuentran en los registros",
               });
             } else {
               dataTableContainer.style.display = "block";
@@ -128,6 +165,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function fetchGetDependencies() {
   const url = `${URL_PATH}/dependencies/getDependencies`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+async function fetchGetCategories() {
+  const url = `${URL_PATH}/dependencies/getCategories`;
 
   return fetch(url, {
     method: "GET",
@@ -180,7 +230,12 @@ function initDataTable(dataTeam) {
             return full.Team_Name + "<br>" + full.Record_Date;
           },
         },
-        { data: "Dependency_Name" },
+        {
+          data: null,
+          render: function (data, type, full, meta) {
+            return full.Dependency_Name + " - " + full.Dependency_Category;
+          },
+        },
         {
           data: null,
           render: function (data, type, full, meta) {

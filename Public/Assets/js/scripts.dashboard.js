@@ -176,7 +176,6 @@ function isBeforeDate(date1, date2) {
   return new Date(date1) <= new Date(date2);
 }
 
-// Function to validate the form
 function validateForm() {
   const startEvent = document.getElementById("start_event").value;
   const endEvent = document.getElementById("end_event").value;
@@ -676,7 +675,7 @@ createCrudTable(
   [
     { data: "id", visible: false },
     { data: "name" },
-    { data: "category", visible: false },
+    { data: "category"},
     {
       defaultContent:
         "<div class='text-center'><button class='btn btn-primary btn-sm editBtnDependency' data-bs-toggle='modal' data-bs-target='#modalDependency'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnDependency'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
@@ -842,7 +841,12 @@ createCrudTable(
         return full.Team_Name + "<br>" + full.Record_Date;
       },
     },
-    { data: "Dependency_Name" },
+    {
+      data: null,
+      render: function (data, type, full, meta) {
+        return full.Dependency_Name + " - " + full.Dependency_Category;
+      },
+    },
     {
       data: null,
       render: function (data, type, full, meta) {

@@ -65,7 +65,11 @@ const dataTableConfig = {
       extend: "excel",
       className: "btn btn-success",
       text: "<i class='fa-solid fa-file-csv'></i> Excel",
-      title: "Registros"
+      title: "Registros",
+      exportOptions: {
+        stripHtml: true,
+        columns: [2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+      },
     },
     {
       extend: "print",
@@ -142,6 +146,7 @@ const initDataTable = async (table, columns, id_dependency) => {
       });
     } else {
       dataTable = new DataTable("#datatable", {
+        deferRender: true,
         ...dataTableConfig,
         paging: false,
         ajax: {
@@ -348,6 +353,7 @@ const createCrudTable = (
       }
       if (TABLE == "register") {
         const dependencySelect = document.getElementById("dependency");
+        const dataTable = document.getElementById("tableContainer");
 
         const fetchPromiseGetDependencies = fetchGetDependencies();
         fetchPromiseGetDependencies.then((data) => {
@@ -358,6 +364,7 @@ const createCrudTable = (
           await initDataTable(TABLE, COLUMNS, dependencySelect.value);
           const form = document.getElementById(FORM_NAME);
           const submitButton = form.querySelector("#action");
+          dataTable.style.display = "block";
 
           const hideModal = () => {
             const myModal = bootstrap.Modal.getOrCreateInstance(
@@ -850,7 +857,7 @@ createCrudTable(
     {
       data: null,
       render: function (data, type, full, meta) {
-        return full.Sport_Name + "<br>" + "Rama: " + full.Sport_Gender;
+        return full.Sport_Name + " - " + full.Sport_Gender;
       },
     },
     {
@@ -900,6 +907,19 @@ createCrudTable(
         );
       },
     },
+    { data: "Record_Date", visible: false },
+    { data: "Team_Name", visible: false },
+    { data: "Player_Account_Number", visible: false },
+    { data: "Player_Semester", visible: false },
+    { data: "Player_Group_Number", visible: false },
+    { data: "Player_Father_Last_Name", visible: false },
+    { data: "Player_Mother_Last_Name", visible: false },
+    { data: "Player_Name", visible: false },
+    { data: "Player_Birthday", visible: false },
+    { data: "Player_Gender", visible: false },
+    { data: "Player_Is_Captain", visible: false },
+    { data: "Player_Phone_Number", visible: false },
+    { data: "Player_Email", visible: false },
   ],
   "registerForm",
   "modalRegister",

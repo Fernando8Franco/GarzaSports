@@ -13,19 +13,34 @@
     </select>
     <label for="dependency">Depenencia</label>
   </div>
-  <table id="datatable" class="table table-bordered table-striped" style="width:100%">
-    <thead>
-      <tr>
-        <th>id</th>
-        <th>Equipo y Fecha registro</th>
-        <th>Dependencia</th>
-        <th>Deporte</th>
-        <th>Datos del Participante</th>
-        <th>Foto</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="tableContainer" style="display: none;">
+    <table id="datatable" class="table table-bordered table-striped" style="width:100%">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>Equipo y Fecha registro</th>
+          <th>Dependencia</th>
+          <th>Deporte</th>
+          <th>Datos del Participante</th>
+          <th>Foto</th>
+          <th>Fecha registro</th>
+          <th>Nombre del Equipo</th>
+          <th>Número de cuenta</th>
+          <th>Semestre</th>
+          <th>Grupo</th>
+          <th>Apellido Paterno</th>
+          <th>Apellido Materno</th>
+          <th>Nombre</th>
+          <th>Edad</th>
+          <th>Sexo</th>
+          <th>Rol</th>
+          <th>Numero de telefono</th>
+          <th>email</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Modal CRUD -->

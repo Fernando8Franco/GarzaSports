@@ -229,8 +229,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   Swal.fire({
                     icon: "error",
                     title: "Error al mandar el formulario.",
-                    text: "Por favor volver a subir el formulario.",
+                    text: "Por favor completa el formulario correctamente.",
                   });
+                  submitButton.disabled = false;
                 }
               } else {
                 console.error("Error:", response.statusText);
@@ -359,7 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <img id="${name}_cropp_photo_${playerNum}" src="${URL_PATH}/assets/images/user256px.png" alt="Imagen recortada" style="max-width: 100%; width: 180px; height: 180px;">
         </div>
 
-        <div class="modal fade" id="${name}_cropModal_${playerNum}" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="${name}_cropModal_${playerNum}" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
           <div class="modal-dialog">
               <div class="modal-content">
                   <div class="modal-header">
@@ -422,7 +423,7 @@ function initializeCroppie(
   const cropModalElement = document.getElementById(modalCrop);
   const croppieContainer = document.getElementById(containerId);
   let croppieInstance = null;
-  let cropModal = null; // Declare the variable to hold the modal instance
+  let cropModal = null;
 
   imageInput.addEventListener("change", function () {
     if (imageInput.files && imageInput.files[0]) {
@@ -432,11 +433,16 @@ function initializeCroppie(
         if (croppieInstance) {
           croppieInstance.destroy();
         }
+        
         croppieInstance = new Croppie(croppieContainer, {
           viewport: { width: 200, height: 200, type: "square" },
           boundary: { width: 300, height: 300 },
           showZoomer: true,
           mouseWheelZoom: "ctrl",
+        });
+
+        croppieInstance.bind({
+          url: `${URL_PATH}/assets/images/whiteImage.jpg`,
         });
 
         function onModalShown() {

@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const adminBtn = document.getElementById("adminBtn")
+  adminBtn.addEventListener("click", function() {
+    window.location.href = URL_PATH + "/admin";
+  });
+
   const fetchPromise = fetchEventDates();
   fetchPromise.then((data) => {
     const eventName = data.name;

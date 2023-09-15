@@ -89,7 +89,7 @@ class EventsController extends Controller
     } else {
       $events = [
         "id" => 0,
-        "name" => "GarzaSports - Ingresar Evento",
+        "name" => "GarzaSports",
         "start_date" => "Sin definir",
         "end_date" => "Sin definir",
         "inst_start_date" => "Sin definir",

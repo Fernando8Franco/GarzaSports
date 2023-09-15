@@ -49,7 +49,7 @@ class RegisterController extends Controller
 
     switch ($option) {
       case 4:
-        if($id_dependency == "-1") {
+        if ($id_dependency == "-1") {
           $registers = $this->teamModel->getRegister();
         } else {
           $registers = $this->teamModel->getRegisterByDependency($id_dependency);
@@ -84,9 +84,10 @@ class RegisterController extends Controller
     echo json_encode($registers, JSON_UNESCAPED_UNICODE);
   }
 
-  public function registersData() {
+  public function registersData()
+  {
     $registerData = $this->teamModel->getCount('team', 'player');
-    if($registerData){
+    if ($registerData) {
       echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
     } else {
       $defaultRecord = [
@@ -145,26 +146,28 @@ class RegisterController extends Controller
         $photo = $_POST["photo"][$i] ?? '';
         $is_captain = $_POST["is_captain"][$i] ?? '';
 
-        if (!empty($acc_number) && !empty($name) && !empty($father_last_name) && !empty($mother_last_name) && !empty($birthday) && !empty($gender) && !empty($phone_number) && !empty($email) && !empty($semester) && !empty($group_num) && !empty($photo)) {
-          $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
-                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, :photo, :is_captain, :id_dependency, :id_team)";
-          $stmtInsertPlayer = $this->con->prepare($sqlInsertPlayer);
-          $stmtInsertPlayer->bindValue(':acc_number', $acc_number);
-          $stmtInsertPlayer->bindValue(':name_s', $name);
-          $stmtInsertPlayer->bindValue(':father_last_name', $father_last_name);
-          $stmtInsertPlayer->bindValue(':mother_last_name', $mother_last_name);
-          $stmtInsertPlayer->bindValue(':birthday', $birthday);
-          $stmtInsertPlayer->bindValue(':gender', $gender);
-          $stmtInsertPlayer->bindValue(':phone_number', $phone_number);
-          $stmtInsertPlayer->bindValue(':email', $email);
-          $stmtInsertPlayer->bindValue(':semester', $semester);
-          $stmtInsertPlayer->bindValue(':group_num', $group_num);
-          $stmtInsertPlayer->bindValue(':photo', $photo);
-          $stmtInsertPlayer->bindValue(':is_captain', $is_captain);
-          $stmtInsertPlayer->bindValue(':id_dependency', $dependencyId);
-          $stmtInsertPlayer->bindValue(':id_team', $id_team);
-          $stmtInsertPlayer->execute();
+        if (empty($acc_number) || empty($name) || empty($father_last_name) || empty($mother_last_name) || empty($birthday) || empty($gender) || empty($phone_number) || empty($email) || empty($semester) || empty($group_num) || empty($photo)) {
+          throw new Exception("Falta uno o más datos obligatorios del jugador.");
         }
+
+        $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
+                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, :photo, :is_captain, :id_dependency, :id_team)";
+        $stmtInsertPlayer = $this->con->prepare($sqlInsertPlayer);
+        $stmtInsertPlayer->bindValue(':acc_number', $acc_number);
+        $stmtInsertPlayer->bindValue(':name_s', $name);
+        $stmtInsertPlayer->bindValue(':father_last_name', $father_last_name);
+        $stmtInsertPlayer->bindValue(':mother_last_name', $mother_last_name);
+        $stmtInsertPlayer->bindValue(':birthday', $birthday);
+        $stmtInsertPlayer->bindValue(':gender', $gender);
+        $stmtInsertPlayer->bindValue(':phone_number', $phone_number);
+        $stmtInsertPlayer->bindValue(':email', $email);
+        $stmtInsertPlayer->bindValue(':semester', $semester);
+        $stmtInsertPlayer->bindValue(':group_num', $group_num);
+        $stmtInsertPlayer->bindValue(':photo', $photo);
+        $stmtInsertPlayer->bindValue(':is_captain', $is_captain);
+        $stmtInsertPlayer->bindValue(':id_dependency', $dependencyId);
+        $stmtInsertPlayer->bindValue(':id_team', $id_team);
+        $stmtInsertPlayer->execute();
       }
 
       $this->con->commit();

@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN a2enmod rewrite
 RUN a2enmod headers
+# COPY my_vhost.conf /etc/apache2/sites-available/my_vhost.conf
+# RUN a2ensite my_vhost.conf
+# RUN a2dissite 000-default.conf
 RUN service apache2 restart
 
 EXPOSE 80

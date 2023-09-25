@@ -21,11 +21,7 @@ class IndexController extends Controller
     $actualDate = date("Y-m-d");
     $event = $this->eventModel->getByBetween($actualDate, 'ins_start_date', 'ins_end_date');
 
-    if($event) {
-      $this->render('intern', 'intern');
-    } else {
-      $this->render('404', 'empty');
-    }
+    $event ? $this->render('intern', 'intern') : $this->render('404', 'empty');
   }
 
   public function search()

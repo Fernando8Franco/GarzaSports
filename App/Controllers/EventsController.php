@@ -14,9 +14,7 @@ class EventsController extends Controller
 
   public function index()
   {
-    if ($_SESSION['role_emp'] == 'Administrador') {
-      $this->renderView('events');
-    }
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador' ? $this->renderView('events') : $this->render('404', 'empty');
   }
 
   public function eventsCRUD()
@@ -33,22 +31,24 @@ class EventsController extends Controller
 
       $option = $_POST['option'] ?? '';
 
-      switch ($option) {
-        case 1:
-          $this->eventModel->insert($data);
-          $events = $this->eventModel->getAll();
-          break;
-        case 2:
-          $this->eventModel->updateById($data['id'], $data);
-          $events = $this->eventModel->getAll();
-          break;
-        case 3:
-          $this->eventModel->deleteByIdEvent($data['id']);
-          $events = $this->eventModel->getAll();
-          break;
-        case 4:
-          $events = $this->eventModel->getAll();
-          break;
+      if (!empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador') {
+        switch ($option) {
+          case 1:
+            $this->eventModel->insert($data);
+            $events = $this->eventModel->getAll();
+            break;
+          case 2:
+            $this->eventModel->updateById($data['id'], $data);
+            $events = $this->eventModel->getAll();
+            break;
+          case 3:
+            $this->eventModel->deleteByIdEvent($data['id']);
+            $events = $this->eventModel->getAll();
+            break;
+          case 4:
+            $events = $this->eventModel->getAll();
+            break;
+        }
       }
 
       foreach ($events as &$event) {

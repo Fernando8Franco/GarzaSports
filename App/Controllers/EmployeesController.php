@@ -15,9 +15,7 @@ class EmployeesController extends Controller
 
   public function index()
   {
-    //if ($_SESSION['role_emp'] == 'Administrador') {
-    $this->renderView('employees');
-    //}
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador' ? $this->renderView('employees') : $this->render('404', 'empty');
   }
 
   public function employeesCRUD()
@@ -62,26 +60,28 @@ class EmployeesController extends Controller
 
     $option = $_POST['option'] ?? '';
 
-    switch ($option) {
-      case 1:
-        $this->employeeModel->insert($data);
-        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
-        break;
-      case 2:
-        $this->employeeModel->updateById($data['id'], $data);
-        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
-        break;
-      case 3:
-        $this->employeeModel->deleteById($data['id']);
-        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
-        break;
-      case 4:
-        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
-        break;
+    if (!empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador') {
+      switch ($option) {
+        case 1:
+          $this->employeeModel->insert($data);
+          $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
+          break;
+        case 2:
+          $this->employeeModel->updateById($data['id'], $data);
+          $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
+          break;
+        case 3:
+          $this->employeeModel->deleteById($data['id']);
+          $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
+          break;
+        case 4:
+          $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
+          break;
+      }
     }
 
     foreach ($employees as &$employee) {
-      if($employee['is_active']) {
+      if ($employee['is_active']) {
         $employee['is_active'] = '<i class="fa-solid fa-check"></i>';
       } else {
         $employee['is_active'] = '<i class="fa-solid fa-xmark"></i>';
@@ -90,7 +90,8 @@ class EmployeesController extends Controller
     echo json_encode($employees, JSON_UNESCAPED_UNICODE);
   }
 
-  public function test() {
+  public function test()
+  {
     $columns = [
       'Employee.id' => 'id',
       'Employee.no_employee' => 'no_employee',

@@ -17,9 +17,7 @@ class TeamsController extends Controller
 
   public function index()
   {
-    if ($_SESSION['role_emp'] == 'Administrador') {
-      $this->renderView('teams');
-    }
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador' ? $this->renderView('teams') : $this->render('404', 'empty');
   }
 
   public function teamsCRUD()
@@ -29,7 +27,7 @@ class TeamsController extends Controller
       'name' => $_POST['name'] ?? '',
     ];
     $option = $_POST['option'] ?? '';
-    
+
     date_default_timezone_set("America/Mexico_City");
     $actualDate = date("Y-m-d");
     $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
@@ -53,18 +51,20 @@ class TeamsController extends Controller
       'Dependency_Sport.is_active' => 1,
     ];
 
-    switch ($option) {
-      case 2:
-        $this->teamModel->updateById($data['id'], $data);
-        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
-        break;
-      case 3:
-        $this->teamModel->deleteByIdTeam($data['id']);
-        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
-        break;
-      case 4:
-        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
-        break;
+    if (!empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador') {
+      switch ($option) {
+        case 2:
+          $this->teamModel->updateById($data['id'], $data);
+          $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
+          break;
+        case 3:
+          $this->teamModel->deleteByIdTeam($data['id']);
+          $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
+          break;
+        case 4:
+          $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
+          break;
+      }
     }
 
     foreach ($teams as &$team) {

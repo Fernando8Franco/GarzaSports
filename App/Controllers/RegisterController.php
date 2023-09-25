@@ -54,16 +54,12 @@ class RegisterController extends Controller
 
   public function index()
   {
-    if ($_SESSION['role_emp'] == 'Administrador') {
-      $this->renderView('register');
-    }
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador' ? $this->renderView('register') : $this->render('404', 'empty');
   }
 
   public function registerByDependency()
   {
-    if ($_SESSION['role_emp'] == 'Empleado') {
-      $this->renderView('registerByDependency');
-    }
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Empleado' ? $this->renderView('registerByDependency') : $this->render('404', 'empty');
   }
 
   public function registerCRUD()
@@ -86,14 +82,16 @@ class RegisterController extends Controller
       'Dependency.id' => $id_dependency,
     ];
 
-    switch ($option) {
-      case 4:
-        if ($id_dependency == "-1") {
-          $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Team.id');
-        } else {
-          $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionalsDependency, 'Team.id');
-        }
-        break;
+    if (!empty($_SESSION['role_emp'])) {
+      switch ($option) {
+        case 4:
+          if ($id_dependency == "-1") {
+            $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Team.id');
+          } else {
+            $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionalsDependency, 'Team.id');
+          }
+          break;
+      }
     }
 
     foreach ($registers as &$register) {

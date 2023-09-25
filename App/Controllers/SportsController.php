@@ -15,9 +15,7 @@ class SportsController extends Controller
 
   public function index()
   {
-    if ($_SESSION['role_emp'] == 'Administrador') {
-      $this->renderView('sports');
-    }
+    !empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador' ? $this->renderView('sports') : $this->render('404', 'empty');
   }
 
   public function sportsCRUD()
@@ -34,22 +32,24 @@ class SportsController extends Controller
 
     $option = $_POST['option'] ?? '';
 
-    switch ($option) {
-      case 1:
-        $this->sportModel->insert($data);
-        $sports = $this->sportModel->getAll();
-        break;
-      case 2:
-        $this->sportModel->updateById($data['id'], $data);
-        $sports = $this->sportModel->getAll();
-        break;
-      case 3:
-        $this->sportModel->deleteByIdDependency_Sport($data['id']);
-        $sports = $this->sportModel->getAll();
-        break;
-      case 4:
-        $sports = $this->sportModel->getAll();
-        break;
+    if (!empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador') {
+      switch ($option) {
+        case 1:
+          $this->sportModel->insert($data);
+          $sports = $this->sportModel->getAll();
+          break;
+        case 2:
+          $this->sportModel->updateById($data['id'], $data);
+          $sports = $this->sportModel->getAll();
+          break;
+        case 3:
+          $this->sportModel->deleteByIdDependency_Sport($data['id']);
+          $sports = $this->sportModel->getAll();
+          break;
+        case 4:
+          $sports = $this->sportModel->getAll();
+          break;
+      }
     }
 
     foreach ($sports as &$sport) {

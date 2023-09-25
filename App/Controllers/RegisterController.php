@@ -238,7 +238,7 @@ class RegisterController extends Controller
         }
 
         $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
-                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, :photo, :is_captain, :id_dependency, :id_team)";
+                                          VALUES (:acc_number, :name_s, :father_last_name, :mother_last_name, :birthday, :gender, :phone_number, :email, :semester, :group_num, CONVERT(varbinary(max), :photo), :is_captain, :id_dependency, :id_team)";
         $stmtInsertPlayer = $this->con->prepare($sqlInsertPlayer);
         $stmtInsertPlayer->bindValue(':acc_number', $acc_number);
         $stmtInsertPlayer->bindValue(':name_s', $name);
@@ -250,7 +250,7 @@ class RegisterController extends Controller
         $stmtInsertPlayer->bindValue(':email', $email);
         $stmtInsertPlayer->bindValue(':semester', $semester);
         $stmtInsertPlayer->bindValue(':group_num', $group_num);
-        $stmtInsertPlayer->bindValue(':photo', $photo);
+        $stmtInsertPlayer->bindValue(':photo', $photo, PDO::PARAM_LOB);
         $stmtInsertPlayer->bindValue(':is_captain', $is_captain);
         $stmtInsertPlayer->bindValue(':id_dependency', $dependencyId);
         $stmtInsertPlayer->bindValue(':id_team', $id_team);
@@ -264,14 +264,16 @@ class RegisterController extends Controller
         'Team.id' => $id_team,
       ];
 
-      $register = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Player.id');
-      echo json_encode($register, JSON_UNESCAPED_UNICODE);
+      $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Player.id');
+
+      echo json_encode($registers, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
       $this->con->rollback();
       $defaultRecord = [
         'Player_ID' => 'NO REGISTRADO',
       ];
       $register = array($defaultRecord);
+
       echo json_encode($register, JSON_UNESCAPED_UNICODE);
     }
   }

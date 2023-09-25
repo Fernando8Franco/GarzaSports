@@ -4,21 +4,6 @@ require_once(__DIR__ . '/../models/event.php');
 
 class EventsController extends Controller
 {
-  private $spanishMonthNames = [
-    'Jan' => 'Ene',
-    'Feb' => 'Feb',
-    'Mar' => 'Mar',
-    'Apr' => 'Abr',
-    'May' => 'May',
-    'Jun' => 'Jun',
-    'Jul' => 'Jul',
-    'Aug' => 'Ago',
-    'Sep' => 'Sep',
-    'Oct' => 'Oct',
-    'Nov' => 'Nov',
-    'Dec' => 'Dic'
-  ];
-
   private $eventModel;
 
   public function __construct(PDO $con)
@@ -51,26 +36,26 @@ class EventsController extends Controller
       switch ($option) {
         case 1:
           $this->eventModel->insert($data);
-          $events = $this->eventModel->getAllDates();
+          $events = $this->eventModel->getAll();
           break;
         case 2:
           $this->eventModel->updateById($data['id'], $data);
-          $events = $this->eventModel->getAllDates();
+          $events = $this->eventModel->getAll();
           break;
         case 3:
           $this->eventModel->deleteByIdEvent($data['id']);
-          $events = $this->eventModel->getAllDates();
+          $events = $this->eventModel->getAll();
           break;
         case 4:
-          $events = $this->eventModel->getAllDates();
+          $events = $this->eventModel->getAll();
           break;
       }
 
       foreach ($events as &$event) {
-        $event['start_date'] = strtr($event['start_date'], $this->spanishMonthNames);
-        $event['end_date'] = strtr($event['end_date'], $this->spanishMonthNames);
-        $event['ins_start_date'] = strtr($event['ins_start_date'], $this->spanishMonthNames);
-        $event['ins_end_date'] = strtr($event['ins_end_date'], $this->spanishMonthNames);
+        $event['start_date'] = $this->formatDate($event['start_date']);
+        $event['end_date'] = $this->formatDate($event['end_date']);
+        $event['ins_start_date'] = $this->formatDate($event['ins_start_date']);
+        $event['ins_end_date'] = $this->formatDate($event['ins_end_date']);
       }
 
       echo json_encode($events, JSON_UNESCAPED_UNICODE);
@@ -79,15 +64,20 @@ class EventsController extends Controller
 
   public function eventsDates()
   {
-    $events = $this->eventModel->getEvent();
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
 
-    if ($events > 0) {
-      $events['start_date'] = strtr($events['start_date'], $this->spanishMonthNames);
-      $events['end_date'] = strtr($events['end_date'], $this->spanishMonthNames);
+    $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
 
-      echo json_encode($events, JSON_UNESCAPED_UNICODE);
+    if ($event) {
+      $event['start_date'] = $this->formatDate($event['start_date']);
+      $event['end_date'] = $this->formatDate($event['end_date']);
+      $event['ins_start_date'] = $this->formatDate($event['ins_start_date']);
+      $event['ins_end_date'] = $this->formatDate($event['ins_end_date']);
+
+      echo json_encode($event, JSON_UNESCAPED_UNICODE);
     } else {
-      $events = [
+      $event = [
         "id" => 0,
         "name" => "GarzaSports",
         "start_date" => "Sin definir",
@@ -95,7 +85,7 @@ class EventsController extends Controller
         "inst_start_date" => "Sin definir",
         "inst_end_date" => "Sin definir"
       ];
-      echo json_encode($events, JSON_UNESCAPED_UNICODE);
+      echo json_encode($event, JSON_UNESCAPED_UNICODE);
     }
   }
 }

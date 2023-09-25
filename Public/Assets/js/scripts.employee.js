@@ -442,7 +442,7 @@ const createCrudTable = (
 
 createCrudTable(
   "registerByDependency",
-  "registerByDependencyCRUD",
+  "registerCRUD",
   [
     { data: "Player_ID", visible: false },
     {

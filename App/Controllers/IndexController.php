@@ -17,9 +17,11 @@ class IndexController extends Controller
 
   public function registroUAEH()
   {
-    $events = $this->eventModel->getEventByIns();
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $event = $this->eventModel->getByBetween($actualDate, 'ins_start_date', 'ins_end_date');
 
-    if($events > 0) {
+    if($event) {
       $this->render('intern', 'intern');
     } else {
       $this->render('404', 'empty');

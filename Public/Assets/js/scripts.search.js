@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
       branchSelect.value != ""
     );
   }
+  form.reset();
 
   const categorySelect = document.getElementById("category");
   const dependencySelect = document.getElementById("dependency");
@@ -133,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData(form);
 
         try {
-          const response = await fetch(`${URL_PATH}/teams/getTeam`, {
+          const response = await fetch(`${URL_PATH}/register/getRegisterByTeam`, {
             method: "POST",
             body: formData,
           });

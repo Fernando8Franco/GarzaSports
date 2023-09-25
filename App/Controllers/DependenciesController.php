@@ -1,16 +1,19 @@
 <?php
 
 require_once(__DIR__ . '/../models/dependency.php');
+require_once(__DIR__ . '/../models/dependencysport.php');
 
 class DependenciesController extends Controller
 {
 
     private $dependencyModel;
+    private $dependencySportModel;
 
     public function __construct(PDO $con)
     {
         parent::__construct($con);
         $this->dependencyModel = new Dependency($con);
+        $this->dependencySportModel = new DependencySport($con);
     }
 
     public function index()
@@ -51,7 +54,12 @@ class DependenciesController extends Controller
 
     public function getDependencies()
     {
-        $dependencies = $this->dependencyModel->getDependencies();
+        $columns = [
+            'id' => 'id',
+            'name' => 'name',
+            'category' => 'category'
+        ];
+        $dependencies = $this->dependencyModel->getByJOINS(false, $columns, [], [], 'name');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($dependencies as $dependency) {
             $options .= "<option value='" . $dependency['id'] . "'>" . $dependency['name'] . "</option>";
@@ -62,11 +70,16 @@ class DependenciesController extends Controller
 
     public function getDependenciesWithAll()
     {
-        $dependencies = $this->dependencyModel->getDependencies();
+        $columns = [
+            'id' => 'id',
+            'name' => 'name',
+            'category' => 'category'
+        ];
+        $dependencies = $this->dependencyModel->getByJOINS(false, $columns, [], [], 'name');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         $options .= '<option value="-1">Todas</option>';
         foreach ($dependencies as $dependency) {
-            $options .= "<option value='" . $dependency['id'] . "'>" . $dependency['name'] . "</option>";
+            $options .= "<option value='" . $dependency['id'] . "'>" . $dependency['name'] . " - " . $dependency['category'] . "</option>";
         }
 
         echo $options;
@@ -74,7 +87,7 @@ class DependenciesController extends Controller
 
     public function getCategories()
     {
-        $categories = $this->dependencyModel->getCategories();
+        $categories = $this->dependencyModel->getDistinct('category', 'category');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($categories as $category) {
             $options .= "<option value='" . $category['category'] . "'>" . $category['category'] . "</option>";
@@ -87,9 +100,17 @@ class DependenciesController extends Controller
     {
         $json_data = file_get_contents('php://input');
         $data = json_decode($json_data, true);
-        $category = $data['category'] ?? '';
+
+        $columns = [
+            'id' => 'id',
+            'name' => 'name',
+        ];
+        $conditionals = [
+            'category' => $data['category'] ?? '',
+        ];
         
-        $dependencies = $this->dependencyModel->getDependenciesByCategory($category);
+
+        $dependencies = $this->dependencyModel->getByJOINS(false, $columns, [], $conditionals, 'name');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($dependencies as $depenency) {
             $options .= "<option value='" . $depenency['id'] . "'>" . $depenency['name'] . "</option>";
@@ -102,9 +123,20 @@ class DependenciesController extends Controller
     {
         $json_data = file_get_contents('php://input');
         $data = json_decode($json_data, true);
-        $dependency = $data['dependency'] ?? '';
-        
-        $branches = $this->dependencyModel->getbranches($dependency);
+
+        $columns = [
+            'Sport.gender' => 'gender',
+        ];
+        $joinTables = [
+            'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
+            'Sport' => 'Dependency_Sport.id_sport = Sport.id',
+        ];
+        $conditionals = [
+            'Dependency.id' => $data['dependency'] ?? '',
+            'Dependency_Sport.is_active' => 1,
+        ];
+
+        $branches = $this->dependencySportModel->getByJOINS(true, $columns, $joinTables, $conditionals, 'Sport.gender');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($branches as $branch) {
             $options .= "<option value='" . $branch['gender'] . "'>" . $branch['gender'] . "</option>";
@@ -117,10 +149,22 @@ class DependenciesController extends Controller
     {
         $json_data = file_get_contents('php://input');
         $data = json_decode($json_data, true);
-        $dependency = $data['dependency'] ?? '';
-        $gender = $data['gender'] ?? '';
-        
-        $sports = $this->dependencyModel->getSportsByDependency($dependency, $gender);
+
+        $columns = [
+            'Sport.id' => 'id',
+            'Sport.name' => 'name',
+        ];
+        $joinTables = [
+            'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
+            'Sport' => 'Dependency_Sport.id_sport = Sport.id',
+        ];
+        $conditionals = [
+            'Dependency.id' => $data['dependency'] ?? '',
+            'Sport.gender' => $data['gender'] ?? '',
+            'Dependency_Sport.is_active' => 1,
+        ];
+
+        $sports = $this->dependencySportModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'name');
         $options = '<option value="" disabled selected>Seleccionar...</option>';
         foreach ($sports as $sport) {
             $options .= "<option value='" . $sport['id'] . "'>" . $sport['name'] . "</option>";

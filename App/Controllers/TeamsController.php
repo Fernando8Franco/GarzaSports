@@ -1,29 +1,18 @@
 <?php
 
 require_once(__DIR__ . '/../models/team.php');
+require_once(__DIR__ . '/../models/event.php');
 
 class TeamsController extends Controller
 {
-  private $spanishMonthNames = [
-    'Jan' => 'Ene',
-    'Feb' => 'Feb',
-    'Mar' => 'Mar',
-    'Apr' => 'Abr',
-    'May' => 'May',
-    'Jun' => 'Jun',
-    'Jul' => 'Jul',
-    'Aug' => 'Ago',
-    'Sep' => 'Sep',
-    'Oct' => 'Oct',
-    'Nov' => 'Nov',
-    'Dec' => 'Dic'
-  ];
   private $teamModel;
+  private $eventModel;
 
   public function __construct(PDO $con)
   {
     parent::__construct($con);
     $this->teamModel = new Team($con);
+    $this->eventModel = new Event($con);
   }
 
   public function index()
@@ -39,65 +28,49 @@ class TeamsController extends Controller
       'id' => $_POST['id'] ?? '',
       'name' => $_POST['name'] ?? '',
     ];
-
     $option = $_POST['option'] ?? '';
+    
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+    $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
+
+    $columns = [
+      'Team.id' => 'id',
+      'Team.name' => 'name',
+      'Team.record_date' => 'record_date',
+      'Dependency.name' => 'dependency_name',
+      'Sport.name' => 'sport_name',
+      'Event.name' => 'event_name',
+    ];
+    $joinTables = [
+      'Dependency_Sport' => 'Team.id_dependency_sport = Dependency_Sport.id',
+      'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
+      'Sport' => 'Dependency_Sport.id_sport = Sport.id',
+      'Event' => 'Team.id_event = Event.id',
+    ];
+    $conditionals = [
+      'Event.id' => ($event !== false) ? $event['id'] : -1,
+      'Dependency_Sport.is_active' => 1,
+    ];
 
     switch ($option) {
       case 2:
         $this->teamModel->updateById($data['id'], $data);
-        $teams = $this->teamModel->getAllTeamsByDate();
+        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
         break;
       case 3:
         $this->teamModel->deleteByIdTeam($data['id']);
-        $teams = $this->teamModel->getAll();
+        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
         break;
       case 4:
-        $teams = $this->teamModel->getAllTeamsByDate();
+        $teams = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'id');
         break;
     }
 
     foreach ($teams as &$team) {
-      $team['record_date'] = strtr($team['record_date'], $this->spanishMonthNames);
+      $team['record_date'] = $this->formatDate($team['record_date']);
     }
 
     echo json_encode($teams, JSON_UNESCAPED_UNICODE);
-  }
-
-  public function getTeam()
-  {
-    $acc_number = $_POST['acc_number'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $dependency = $_POST['dependency'] ?? '';
-    $sport = $_POST['sport'] ?? '';
-
-    $id_team = $this->teamModel->getTeamByAccEmailDependencySport($acc_number, $email, $dependency, $sport);
-
-    if (!empty($id_team)) {
-      $register = $this->teamModel->getRegisterByTeam($id_team['id']);
-      echo json_encode($register, JSON_UNESCAPED_UNICODE);
-    } else {
-      $defaultRecord = array(
-        'Player_ID' => 'NO REGISTRADO',
-        'Player_Account_Number' => 'NO REGISTRADO',
-        'Player_Name' => 'NO REGISTRADO',
-        'Player_Father_Last_Name' => 'NO REGISTRADO',
-        'Player_Mother_Last_Name' => 'NO REGISTRADO',
-        'Player_Birthday' => 'NO REGISTRADO',
-        'Player_Gender' => 'NO REGISTRADO',
-        'Player_Phone_Number' => 'NO REGISTRADO',
-        'Player_Email' => 'NO REGISTRADO',
-        'Player_Semester' => 'NO REGISTRADO',
-        'Player_Group_Number' => 'NO REGISTRADO',
-        'Player_Photo' => 'NO REGISTRADO',
-        'Player_Is_Captain' => 'NO REGISTRADO',
-        'Dependency_Name' => 'NO REGISTRADO',
-        'Sport_Name' => 'NO REGISTRADO',
-        'Sport_Gender' => 'NO REGISTRADO',
-        'Team_Name' => 'NO REGISTRADO',
-        'Record_Date' => 'NO REGISTRADO',
-      );
-      $register = array($defaultRecord);
-      echo json_encode($register, JSON_UNESCAPED_UNICODE);
-    }
   }
 }

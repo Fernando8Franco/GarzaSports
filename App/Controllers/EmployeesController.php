@@ -22,6 +22,21 @@ class EmployeesController extends Controller
 
   public function employeesCRUD()
   {
+    $columns = [
+      'Employee.id' => 'id',
+      'Employee.no_employee' => 'no_employee',
+      'Employee.name_s' => 'name_s',
+      'Employee.father_last_name' => 'father_last_name',
+      'Employee.mother_last_name' => 'mother_last_name',
+      'Employee.role_emp' => 'role_emp',
+      'Employee.id_dependency' => 'id_dependency',
+      'Employee.is_active' => 'is_active',
+      'Dependency.name' => 'dependency_name',
+    ];
+    $joinTables = [
+      'Dependency' => 'Employee.id_dependency = Dependency.id',
+    ];
+
     $password = $_POST['password'] ?? '';
 
     if (!empty($password)) {
@@ -50,21 +65,47 @@ class EmployeesController extends Controller
     switch ($option) {
       case 1:
         $this->employeeModel->insert($data);
-        $employees = $this->employeeModel->getAllEmployees();
+        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
         break;
       case 2:
         $this->employeeModel->updateById($data['id'], $data);
-        $employees = $this->employeeModel->getAllEmployees();
+        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
         break;
       case 3:
         $this->employeeModel->deleteById($data['id']);
-        $employees = $this->employeeModel->getAllEmployees();
+        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
         break;
       case 4:
-        $employees = $this->employeeModel->getAllEmployees();
+        $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
         break;
     }
 
+    foreach ($employees as &$employee) {
+      if($employee['is_active']) {
+        $employee['is_active'] = '<i class="fa-solid fa-check"></i>';
+      } else {
+        $employee['is_active'] = '<i class="fa-solid fa-xmark"></i>';
+      }
+    }
     echo json_encode($employees, JSON_UNESCAPED_UNICODE);
+  }
+
+  public function test() {
+    $columns = [
+      'Employee.id' => 'id',
+      'Employee.no_employee' => 'no_employee',
+      'Employee.name_s' => 'name_s',
+      'Employee.father_last_name' => 'father_last_name',
+      'Employee.mother_last_name' => 'mother_last_name',
+      'Employee.role_emp' => 'role_emp',
+      'Employee.id_dependency' => 'id_dependency',
+      'Employee.is_active' => 'is_active',
+      'Dependency.name' => 'dependency_name',
+    ];
+    $joinTables = [
+      'Dependency' => 'Employee.id_dependency = Dependency.id',
+    ];
+    $employees = $this->employeeModel->getByJOINS(false, $columns, $joinTables, [], 'id');
+    echo $employees;
   }
 }

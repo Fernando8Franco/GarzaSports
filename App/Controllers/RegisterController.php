@@ -3,6 +3,7 @@
 require_once(__DIR__ . '/../models/team.php');
 require_once(__DIR__ . '/../models/player.php');
 require_once(__DIR__ . '/../models/event.php');
+require_once(__DIR__ . '/../models/dependencysport.php');
 
 class RegisterController extends Controller
 {
@@ -10,6 +11,36 @@ class RegisterController extends Controller
   private $teamModel;
   private $eventModel;
   private $playerModel;
+  private $dependencySportModel;
+
+  private $columns = [
+    'Player.id' => 'Player_ID',
+    'Player.acc_number' => 'Player_Account_Number',
+    'Player.name_s' => 'Player_Name',
+    'Player.father_last_name' => 'Player_Father_Last_Name',
+    'Player.mother_last_name' => 'Player_Mother_Last_Name',
+    'Player.birthday' => 'Player_Birthday',
+    'Player.gender' => 'Player_Gender',
+    'Player.phone_number' => 'Player_Phone_Number',
+    'Player.email' => 'Player_Email',
+    'Player.semester' => 'Player_Semester',
+    'Player.group_num' => 'Player_Group_Number',
+    'Player.photo' => 'Player_Photo',
+    'Player.is_captain' => 'Player_Is_Captain',
+    'Dependency.name' => 'Dependency_Name',
+    'Dependency.category' => 'Dependency_Category',
+    'Sport.name' => 'Sport_Name',
+    'Sport.gender' => 'Sport_Gender',
+    'Team.name' => 'Team_Name',
+    'Team.record_date' => 'Record_Date',
+  ];
+  private $joinTables = [
+    'Team' => 'Player.id_team = Team.id',
+    'Dependency_Sport' => 'Team.id_dependency_sport = Dependency_Sport.id',
+    'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
+    'Sport' => 'Dependency_Sport.id_sport = Sport.id',
+    'Event' => 'Team.id_event = Event.id',
+  ];
 
   public function __construct(PDO $con)
   {
@@ -18,6 +49,7 @@ class RegisterController extends Controller
     $this->teamModel = new Team($con);
     $this->playerModel = new Player($con);
     $this->eventModel = new Event($con);
+    $this->dependencySportModel = new DependencySport($con);
   }
 
   public function index()
@@ -41,38 +73,11 @@ class RegisterController extends Controller
     if (empty($id_dependency)) {
       $id_dependency = $_SESSION['id_dependency'];
     }
+
     date_default_timezone_set("America/Mexico_City");
     $actualDate = date("Y-m-d");
     $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
 
-    $columns = [
-      'Player.id' => 'Player_ID',
-      'Player.acc_number' => 'Player_Account_Number',
-      'Player.name_s' => 'Player_Name',
-      'Player.father_last_name' => 'Player_Father_Last_Name',
-      'Player.mother_last_name' => 'Player_Mother_Last_Name',
-      'Player.birthday' => 'Player_Birthday',
-      'Player.gender' => 'Player_Gender',
-      'Player.phone_number' => 'Player_Phone_Number',
-      'Player.email' => 'Player_Email',
-      'Player.semester' => 'Player_Semester',
-      'Player.group_num' => 'Player_Group_Number',
-      'Player.photo' => 'Player_Photo',
-      'Player.is_captain' => 'Player_Is_Captain',
-      'Dependency.name' => 'Dependency_Name',
-      'Dependency.category' => 'Dependency_Category',
-      'Sport.name' => 'Sport_Name',
-      'Sport.gender' => 'Sport_Gender',
-      'Team.name' => 'Team_Name',
-      'Team.record_date' => 'Record_Date',
-    ];
-    $joinTables = [
-      'Team' => 'Player.id_team = Team.id',
-      'Dependency_Sport' => 'Team.id_dependency_sport = Dependency_Sport.id',
-      'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
-      'Sport' => 'Dependency_Sport.id_sport = Sport.id',
-      'Event' => 'Team.id_event = Event.id',
-    ];
     $conditionals = [
       'Event.id' => ($event !== false) ? $event['id'] : -1,
     ];
@@ -84,9 +89,9 @@ class RegisterController extends Controller
     switch ($option) {
       case 4:
         if ($id_dependency == "-1") {
-          $registers = $this->playerModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'Team.id');
+          $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Team.id');
         } else {
-          $registers = $this->playerModel->getByJOINS(false, $columns, $joinTables, $conditionalsDependency, 'Team.id');
+          $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionalsDependency, 'Team.id');
         }
         break;
     }
@@ -126,7 +131,7 @@ class RegisterController extends Controller
     } else if ($_SESSION['role_emp'] == 'Empleado') {
       $registerData = $this->eventModel->getByJOINS(false, $columnsDependency, [], $conditionalsDependency, 'Event.id');
     }
-    
+
     if ($registerData) {
       $registerData = $registerData[0];
       echo json_encode($registerData, JSON_UNESCAPED_UNICODE);
@@ -167,43 +172,15 @@ class RegisterController extends Controller
       'Event.id' => ($event !== false) ? $event['id'] : -1,
     ];
 
-    $id_team = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'Team.id');
+    $id_team = $this->teamModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'Team.id DESC');
 
     if (!empty($id_team[0])) {
-      $columnsPlayer = [
-        'Player.id' => 'Player_ID',
-        'Player.acc_number' => 'Player_Account_Number',
-        'Player.name_s' => 'Player_Name',
-        'Player.father_last_name' => 'Player_Father_Last_Name',
-        'Player.mother_last_name' => 'Player_Mother_Last_Name',
-        'Player.birthday' => 'Player_Birthday',
-        'Player.gender' => 'Player_Gender',
-        'Player.phone_number' => 'Player_Phone_Number',
-        'Player.email' => 'Player_Email',
-        'Player.semester' => 'Player_Semester',
-        'Player.group_num' => 'Player_Group_Number',
-        'Player.photo' => 'Player_Photo',
-        'Player.is_captain' => 'Player_Is_Captain',
-        'Dependency.name' => 'Dependency_Name',
-        'Dependency.category' => 'Dependency_Category',
-        'Sport.name' => 'Sport_Name',
-        'Sport.gender' => 'Sport_Gender',
-        'Team.name' => 'Team_Name',
-        'Team.record_date' => 'Record_Date',
-      ];
-      $joinTablesPlayer = [
-        'Team' => 'Player.id_team = Team.id',
-        'Dependency_Sport' => 'Team.id_dependency_sport = Dependency_Sport.id',
-        'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
-        'Sport' => 'Dependency_Sport.id_sport = Sport.id',
-        'Event' => 'Team.id_event = Event.id',
-      ];
       $conditionalsPlayer = [
         'Event.id' => ($event !== false) ? $event['id'] : -1,
         'Team.id' => $id_team[0]['id'],
       ];
 
-      $registers = $this->playerModel->getByJOINS(false, $columnsPlayer, $joinTablesPlayer, $conditionalsPlayer, 'Player.id');
+      $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionalsPlayer, 'Player.id');
       foreach ($registers as &$register) {
         $register['Player_Birthday'] = $this->calculateAge($register['Player_Birthday']);
         $register['Record_Date'] = $this->formatDate($register['Record_Date']);
@@ -225,20 +202,11 @@ class RegisterController extends Controller
     $dependencyId = $_POST["id_dependency"][0] ?? '';
     $sportId = $_POST["id_sport"][0] ?? '';
 
-    $sqlDependecySport = "SELECT id FROM Dependency_Sport WHERE id_dependency = :id_dependency AND id_sport = :id_sport AND is_active = 1";
-    $stmDependencySport = $this->con->prepare($sqlDependecySport);
-    $stmDependencySport->bindValue(":id_dependency", $dependencyId);
-    $stmDependencySport->bindValue(":id_sport", $sportId);
-    $stmDependencySport->execute();
-    $idDependecySport = $stmDependencySport->fetchColumn();
+    $idDependecySport = $this->dependencySportModel->getByJOINS(false, ['id' => 'id'], [], ['id_dependency' => $dependencyId, 'id_sport' => $sportId,], 'id');
 
     date_default_timezone_set("America/Mexico_City");
     $actualDate = date("Y-m-d");
-    $queryEvent = "SELECT id FROM Event WHERE :targetDate BETWEEN ins_start_date AND ins_end_date";
-    $stm = $this->con->prepare($queryEvent);
-    $stm->bindValue(":targetDate", $actualDate);
-    $stm->execute();
-    $idEvent = $stm->fetchColumn();
+    $idEvent = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
 
     try {
       $this->con->beginTransaction();
@@ -247,8 +215,8 @@ class RegisterController extends Controller
       $stmInsertTeam = $this->con->prepare($sqlInsertTeam);
       $stmInsertTeam->bindValue(':teamName', $teamName);
       $stmInsertTeam->bindValue(':record_date', $actualDate);
-      $stmInsertTeam->bindValue(':id_dependency_sport', $idDependecySport);
-      $stmInsertTeam->bindValue(':id_event', $idEvent);
+      $stmInsertTeam->bindValue(':id_dependency_sport', $idDependecySport[0]['id']);
+      $stmInsertTeam->bindValue(':id_event', $idEvent['id']);
       $stmInsertTeam->execute();
 
       $id_team = $this->con->lastInsertId();
@@ -293,12 +261,15 @@ class RegisterController extends Controller
 
       $this->con->commit();
 
-      $register = $this->teamModel->getRegisterByTeam($id_team);
+      $conditionals = [
+        'Event.id' => ($idEvent !== false) ? $idEvent['id'] : -1,
+        'Team.id' => $id_team,
+      ];
+
+      $register = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Player.id');
       echo json_encode($register, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
-      // En caso de error, revertir la transacción
       $this->con->rollback();
-      //echo "Error: " . $e->getMessage();
       $defaultRecord = [
         'Player_ID' => 'NO REGISTRADO',
       ];
@@ -306,60 +277,4 @@ class RegisterController extends Controller
       echo json_encode($register, JSON_UNESCAPED_UNICODE);
     }
   }
-
-  // public function registerByDependencyCRUD()
-  // {
-  //   $option = $_POST['option'] ?? '';
-  //   $id_dependency = $_SESSION['id_dependency'];
-
-  //   date_default_timezone_set("America/Mexico_City");
-  //   $actualDate = date("Y-m-d");
-  //   $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
-
-  //   $columns = [
-  //     'Player.id' => 'Player_ID',
-  //     'Player.acc_number' => 'Player_Account_Number',
-  //     'Player.name_s' => 'Player_Name',
-  //     'Player.father_last_name' => 'Player_Father_Last_Name',
-  //     'Player.mother_last_name' => 'Player_Mother_Last_Name',
-  //     'Player.birthday' => 'Player_Birthday',
-  //     'Player.gender' => 'Player_Gender',
-  //     'Player.phone_number' => 'Player_Phone_Number',
-  //     'Player.email' => 'Player_Email',
-  //     'Player.semester' => 'Player_Semester',
-  //     'Player.group_num' => 'Player_Group_Number',
-  //     'Player.photo' => 'Player_Photo',
-  //     'Player.is_captain' => 'Player_Is_Captain',
-  //     'Dependency.name' => 'Dependency_Name',
-  //     'Dependency.category' => 'Dependency_Category',
-  //     'Sport.name' => 'Sport_Name',
-  //     'Sport.gender' => 'Sport_Gender',
-  //     'Team.name' => 'Team_Name',
-  //     'Team.record_date' => 'Record_Date',
-  //   ];
-  //   $joinTables = [
-  //     'Team' => 'Player.id_team = Team.id',
-  //     'Dependency_Sport' => 'Team.id_dependency_sport = Dependency_Sport.id',
-  //     'Dependency' => 'Dependency_Sport.id_dependency = Dependency.id',
-  //     'Sport' => 'Dependency_Sport.id_sport = Sport.id',
-  //     'Event' => 'Team.id_event = Event.id',
-  //   ];
-  //   $conditionalsDependency = [
-  //     'Event.id' => $event['id'],
-  //     'Dependency.id' => $id_dependency,
-  //   ];
-
-  //   switch ($option) {
-  //     case 4:
-  //       $registers = $this->playerModel->getByJOINS(false, $columns, $joinTables, $conditionalsDependency, 'Team.id');;
-  //       break;
-  //   }
-
-  //   foreach ($registers as &$register) {
-  //     $register['Player_Birthday'] = $this->calculateAge($register['Player_Birthday']);
-  //     $register['Record_Date'] = strtr($register['Record_Date'], $this->spanishMonthNames);
-  //   }
-
-  //   echo json_encode($registers, JSON_UNESCAPED_UNICODE);
-  // }
 }

@@ -16,7 +16,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: Y
-      SA_PASSWORD: Fernad0101
+      SA_PASSWORD: ${DB_PASSWORD}
     volumes:
       - dbdata:/var/opt/mssql
     ports:

@@ -234,7 +234,7 @@ class RegisterController extends Controller
         $is_captain = $_POST["is_captain"][$i] ?? '';
 
         if (empty($acc_number) || empty($name) || empty($father_last_name) || empty($mother_last_name) || empty($birthday) || empty($gender) || empty($phone_number) || empty($email) || empty($semester) || empty($group_num) || empty($photo)) {
-          throw new Exception("Falta uno o más datos obligatorios del jugador.");
+          continue;
         }
 
         $sqlInsertPlayer = "INSERT INTO Player (acc_number, name_s, father_last_name, mother_last_name, birthday, gender, phone_number, email, semester, group_num, photo, is_captain, id_dependency, id_team) 
@@ -265,13 +265,20 @@ class RegisterController extends Controller
       ];
 
       $registers = $this->playerModel->getByJOINS(false, $this->columns, $this->joinTables, $conditionals, 'Player.id');
+      foreach ($registers as &$register) {
+        $register['Player_Birthday'] = $this->calculateAge($register['Player_Birthday']);
+        $register['Record_Date'] = $this->formatDate($register['Record_Date']);
+        $register['Player_Is_Captain'] = ($register['Player_Is_Captain']) ? 'CAPITAN' : 'JUGADOR';
+      }
 
       echo json_encode($registers, JSON_UNESCAPED_UNICODE);
     } catch (Exception $e) {
       $this->con->rollback();
+
       $defaultRecord = [
         'Player_ID' => 'NO REGISTRADO',
       ];
+
       $register = array($defaultRecord);
 
       echo json_encode($register, JSON_UNESCAPED_UNICODE);

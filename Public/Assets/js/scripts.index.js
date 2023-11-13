@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function fetchEventDates() {
-  const url = `${URL_PATH}/events/eventsDates`;
+  const url = `${URL_PATH}/events/eventsDatesWithoutFormat`;
 
   return fetch(url, {
     method: "GET",

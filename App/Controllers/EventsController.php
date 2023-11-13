@@ -88,4 +88,26 @@ class EventsController extends Controller
       echo json_encode($event, JSON_UNESCAPED_UNICODE);
     }
   }
+
+  public function eventsDatesWithoutFormat()
+  {
+    date_default_timezone_set("America/Mexico_City");
+    $actualDate = date("Y-m-d");
+
+    $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
+
+    if ($event) {
+      echo json_encode($event, JSON_UNESCAPED_UNICODE);
+    } else {
+      $event = [
+        "id" => 0,
+        "name" => "GarzaSports",
+        "start_date" => "Sin definir",
+        "end_date" => "Sin definir",
+        "inst_start_date" => "Sin definir",
+        "inst_end_date" => "Sin definir"
+      ];
+      echo json_encode($event, JSON_UNESCAPED_UNICODE);
+    }
+  }
 }

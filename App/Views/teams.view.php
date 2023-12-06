@@ -37,7 +37,7 @@
             <div class="form-floating">
               <input type="text" class="form-control mb-4" name="name" id="name" placeholder="Nombre del Evento"
                 required>
-              <label for="name">Nombre del Deporte</label>
+              <label for="name">Nombre del Equipo</label>
             </div>
             <div class="form-floating">
               <input type="disabledTextInput" class="form-control mb-4" name="record_date" id="record_date"

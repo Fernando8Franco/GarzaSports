@@ -52,7 +52,7 @@
                 <option value="BACHILLERATO">BACHILLERATO</option>
                 <option value="LICENCIATURA">LICENCIATURA</option>
               </select>
-              <label for="dependency">Dependencia</label>
+              <label for="dependency">Categoria</label>
             </div>
             <!-- <input type="hidden" name="category" id="category" value="DEPENDENCIA"> -->
           </div>

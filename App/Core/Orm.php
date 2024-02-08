@@ -106,6 +106,26 @@ class Orm
 
   public function deleteByIdDependency_Sport($id)
   {
+    $stm = $this->db->prepare("DELETE FROM Player
+    WHERE id_team IN (
+        SELECT T.id
+        FROM Team T
+        INNER JOIN Dependency_Sport DS ON T.id_dependency_sport = DS.id
+        INNER JOIN Sport S ON DS.id_sport = S.id
+        WHERE S.id = :id
+    );
+    ");
+    $stm->bindValue(':id', $id);
+    $stm->execute();
+    $stm = $this->db->prepare("DELETE FROM Team
+    WHERE id_dependency_sport IN (
+        SELECT DS.id
+        FROM Dependency_Sport DS
+        WHERE DS.id_sport = :id
+    );
+    ");
+    $stm->bindValue(':id', $id);
+    $stm->execute();
     $stm = $this->db->prepare("DELETE FROM Dependency_Sport WHERE id_{$this->table} = :id");
     $stm->bindValue(':id', $id);
     $stm->execute();

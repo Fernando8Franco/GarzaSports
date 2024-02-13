@@ -135,7 +135,7 @@ class DependenciesController extends Controller
     ];
     $conditionals = [
       'Dependency.id' => $data['dependency'] ?? '',
-      'Dependency_Sport.is_active' => 1,
+      'Sport.is_active' => 1,
     ];
 
     $branches = $this->dependencySportModel->getByJOINS(true, $columns, $joinTables, $conditionals, 'Sport.gender');
@@ -163,7 +163,7 @@ class DependenciesController extends Controller
     $conditionals = [
       'Dependency.id' => $data['dependency'] ?? '',
       'Sport.gender' => $data['gender'] ?? '',
-      'Dependency_Sport.is_active' => 1,
+      'Sport.is_active' => 1,
     ];
 
     $sports = $this->dependencySportModel->getByJOINS(false, $columns, $joinTables, $conditionals, 'name');

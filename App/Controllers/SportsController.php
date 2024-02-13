@@ -27,7 +27,8 @@ class SportsController extends Controller
       'gender' => $_POST['gender'] ?? '',
       'num_players' => $_POST['num_players'] ?? '',
       'num_extraplayers' => $_POST['num_extraplayers'] ?? '',
-      'has_captain' => $_POST['has_captain'] ?? ''
+      'has_captain' => $_POST['has_captain'] ?? '',
+      'is_active' => $_POST['is_active'] ?? '',
     ];
 
     $option = $_POST['option'] ?? '';
@@ -57,6 +58,11 @@ class SportsController extends Controller
         $sport['has_captain'] = '<i class="fa-solid fa-check"></i>';
       } else {
         $sport['has_captain'] = '<i class="fa-solid fa-xmark"></i>';
+      }
+      if ($sport['is_active']) {
+        $sport['is_active'] = '<i class="fa-solid fa-check"></i>';
+      } else {
+        $sport['is_active'] = '<i class="fa-solid fa-xmark"></i>';
       }
     }
 

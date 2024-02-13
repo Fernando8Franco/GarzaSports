@@ -25,6 +25,7 @@
         <th>No. de jugadores</th>
         <th>No. de jugadores extra</th>
         <th>Requiere capitán</th>
+        <th>Activo</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -68,22 +69,31 @@
               </div>
             </div>
             <div class="row g-2">
-              <div class="form-floating col-4">
+              <div class="form-floating col-6">
                 <input type="number" class="form-control mb-4" name="num_players" id="num_players"
                   placeholder="Nombre del Evento" required>
                 <label for="num_players">No. jugadores</label>
               </div>
-              <div class="form-floating col-4">
+              <div class="form-floating col-6">
                 <input type="number" class="form-control mb-4" name="num_extraplayers" id="num_extraplayers"
                   placeholder="Nombre del Evento" required>
                 <label for="num_extraplayers">Jugadores extra</label>
               </div>
-              <div class="form-floating col-4">
+            </div>
+            <div class="row g-2">
+              <div class="form-floating col-6">
                 <select class="form-select mb-4" id="has_captain" name="has_captain" aria-label="Default select example">
                   <option value="1">Si</option>
                   <option value="0">No</option>
                 </select>
                 <label for="has_captain">¿Requiere Capitan?</label>
+              </div>
+              <div class="form-floating col-6">
+                <select class="form-select mb-4" id="is_active" name="is_active" aria-label="Default select example">
+                  <option value="1">Si</option>
+                  <option value="0">No</option>
+                </select>
+                <label for="is_active">¿Está activo?</label>
               </div>
             </div>
           </div>

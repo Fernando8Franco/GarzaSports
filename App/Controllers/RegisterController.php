@@ -66,19 +66,24 @@ class RegisterController extends Controller
   {
     $option = $_POST['option'] ?? '';
     $id_dependency = $_POST['id_dependency'] ?? '';
+    $id_event = $_POST['id_event'] ?? '';
+
     if (empty($id_dependency)) {
       $id_dependency = $_SESSION['id_dependency'];
     }
-
-    date_default_timezone_set("America/Mexico_City");
-    $actualDate = date("Y-m-d");
-    $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
+    if (empty($id_event)) {
+      date_default_timezone_set("America/Mexico_City");
+      $actualDate = date("Y-m-d");
+      $event = $this->eventModel->getByBetween($actualDate, 'start_date', 'end_date');
+      $id_event = ($event !== false) ? $event['id'] : -1;
+    }
 
     $conditionals = [
-      'Event.id' => ($event !== false) ? $event['id'] : -1,
+      'Event.id' => $id_event,
     ];
+    
     $conditionalsDependency = [
-      'Event.id' => ($event !== false) ? $event['id'] : -1,
+      'Event.id' => $id_event,
       'Dependency.id' => $id_dependency,
     ];
 
@@ -209,7 +214,7 @@ class RegisterController extends Controller
     try {
       $this->con->beginTransaction();
 
-      $sqlInsertTeam = "INSERT INTO Team (name, record_date, id_dependency_sport, id_event) VALUES (:teamName, CONVERT(DATE, :record_date), :id_dependency_sport, :id_event)";
+      $sqlInsertTeam = "INSERT INTO Team (name, record_date, id_dependency_sport, id_event) VALUES (:teamName, :record_date, :id_dependency_sport, :id_event)";
       $stmInsertTeam = $this->con->prepare($sqlInsertTeam);
       $stmInsertTeam->bindValue(':teamName', $teamName);
       $stmInsertTeam->bindValue(':record_date', $actualDate);

@@ -8,6 +8,12 @@
 <button id="deleteRegister" type="button" class="d-none"></button>
 <div class="container table-responsive pt-2">
   <div class="form-floating">
+    <select class="form-select mb-4" id="event" name="event" aria-label="Default select example" required>
+      <option value="" disabled selected>Seleccionar...</option>
+    </select>
+    <label for="event">Evento</label>
+  </div>
+  <div class="form-floating">
     <select class="form-select mb-4" id="dependency" name="dependency" aria-label="Default select example" required>
       <option value="" disabled selected>Seleccionar...</option>
     </select>

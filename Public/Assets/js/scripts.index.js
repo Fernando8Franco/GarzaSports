@@ -4,12 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     window.open(URL_PATH + "/admin", "_blank");
   });
 
-  const fetchPromise = fetchEventDates();
-  fetchPromise.then((data) => {
-    const eventName = data.name;
-    document.getElementById("eventName").textContent = "Registro " + eventName;
-  });
-
   const buttonSearch = document.getElementById("search");
   const buttonRegister = document.getElementById("register");
 

@@ -20,13 +20,34 @@ class EventsController extends Controller
   public function eventsCRUD()
   {
     if ($_SESSION['role_emp'] == 'Administrador') {
+      if(isset($_FILES['banner'])) {
+        $file = $_FILES['banner'];
+        
+        // Verificamos si no ha ocurrido un error durante la carga del archivo
+        if($file['error'] === 0) {
+          $fileName = $file['name'];
+          $fileTmpName = $file['tmp_name'];
+          $fileSize = $file['size'];
+          $fileError = $file['error'];
+          $fileType = $file['type'];
+
+          $newFileName = uniqid('', true) . '_' . $fileName;
+          
+          // Movemos el archivo temporal a una ubicación permanente en el servidor
+          $uploadPath = str_replace("App", "Public", SITE_ROOT) . '\\assets\\images\\banners\\' . $newFileName;
+          $uploadPathWeb = '/assets/images/banners/' . $newFileName;
+          move_uploaded_file($fileTmpName, $uploadPath);
+        }
+      }
+
       $data = [
         'id' => $_POST['id'] ?? '',
         'name' => $_POST['name'] ?? '',
         'start_date' => $_POST['start_event'] ?? '',
         'end_date' => $_POST['end_event'] ?? '',
         'ins_start_date' => $_POST['ins_start_event'] ?? '',
-        'ins_end_date' => $_POST['ins_end_event'] ?? ''
+        'ins_end_date' => $_POST['ins_end_event'] ?? '',
+        'banner' => $uploadPathWeb ?? '/assets/images/banners/default-banner.png'
       ];
 
       $option = $_POST['option'] ?? '';
@@ -105,9 +126,24 @@ class EventsController extends Controller
         "start_date" => "Sin definir",
         "end_date" => "Sin definir",
         "inst_start_date" => "Sin definir",
-        "inst_end_date" => "Sin definir"
+        "inst_end_date" => "Sin definir",
+        "banner" => "/assets/images/banners/default-banner.png"
       ];
       echo json_encode($event, JSON_UNESCAPED_UNICODE);
     }
+  }
+
+  public function eventsform() {
+    $columns = [
+      'id' => 'id',
+      'name' => 'name'
+    ];
+    $events = $this->eventModel->getByJOINS(false, $columns, [], [], 'id DESC');
+    $options = '<option value="" disabled selected>Seleccionar...</option>';
+    foreach ($events as $event) {
+      $options .= "<option value='" . $event['id'] . "'>" . $event['name'] . "</option>";
+    }
+
+    echo $options;
   }
 }

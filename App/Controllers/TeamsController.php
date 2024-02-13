@@ -48,7 +48,6 @@ class TeamsController extends Controller
     ];
     $conditionals = [
       'Event.id' => ($event !== false) ? $event['id'] : -1,
-      'Dependency_Sport.is_active' => 1,
     ];
 
     if (!empty($_SESSION['role_emp']) && $_SESSION['role_emp'] == 'Administrador') {

@@ -25,10 +25,15 @@ html {
   font-size: 45px;
 }
 .indexIcon {
-  font-size: 192px;
+  font-size: 170px;
 }
 @media screen and (max-width: 555px) {
   .indexIcon {
     font-size: 100px;
   }
 }
+.img-index {
+  max-width: 100%; 
+  height: auto;
+}
+

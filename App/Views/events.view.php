@@ -26,6 +26,7 @@
           <th>Finalización Evento</th>
           <th>Inicio inscripción al evento</th>
           <th>Fin inscripción al evento</th>
+          <th class="banner-column">Banner</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -72,6 +73,12 @@
                     <label>Finalización inscripción</label>
                     <input type="date" name="ins_end_event" id="ins_end_event" class="form-control" required>
                   </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label>Banner:</label>
+                <div>
+                  <input type="file" name="banner" accept="image/*" required>
                 </div>
               </div>
             </div>

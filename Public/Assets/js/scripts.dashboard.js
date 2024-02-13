@@ -113,7 +113,7 @@ const dataTableConfig = {
   ],
 };
 
-const initDataTable = async (table, columns, id_dependency) => {
+const initDataTable = async (table, columns, id_dependency, id_event) => {
   try {
     if (dataTableIsInitialized) {
       dataTable.destroy();
@@ -152,7 +152,7 @@ const initDataTable = async (table, columns, id_dependency) => {
         ajax: {
           url: URL_PATH + "/" + table + "/" + table + "CRUD",
           method: "POST",
-          data: { option: option, id_dependency: id_dependency},
+          data: { option: option, id_dependency: id_dependency, id_event: id_event},
           dataSrc: "",
         },
         columns: columns,
@@ -268,6 +268,19 @@ async function fetchGetDependencies() {
     });
 }
 
+async function fetchGetEvents() {
+  const url = `${URL_PATH}/events/eventsform`;
+
+  return fetch(url, {
+    method: "GET",
+    dataType: "json",
+  })
+    .then((response) => response.text())
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
 async function fetchRegisters() {
   const url = `${URL_PATH}/register/registersData`;
 
@@ -353,15 +366,23 @@ const createCrudTable = (
       }
       if (TABLE == "register") {
         const dependencySelect = document.getElementById("dependency");
+        const eventSelect = document.getElementById("event");
         const dataTable = document.getElementById("tableContainer");
 
-        const fetchPromiseGetDependencies = fetchGetDependencies();
-        fetchPromiseGetDependencies.then((data) => {
-          dependencySelect.innerHTML = data;
+        const fetchPromiseGetEvents = fetchGetEvents();
+        fetchPromiseGetEvents.then((data) => {
+          eventSelect.innerHTML = data;
+        });
+
+        eventSelect.addEventListener("change", async function() {
+          const fetchPromiseGetDependencies = fetchGetDependencies();
+          fetchPromiseGetDependencies.then((data) => {
+            dependencySelect.innerHTML = data;
+          });
         });
 
         dependencySelect.addEventListener("change", async function () {
-          await initDataTable(TABLE, COLUMNS, dependencySelect.value);
+          await initDataTable(TABLE, COLUMNS, dependencySelect.value, eventSelect.value);
           const form = document.getElementById(FORM_NAME);
           const submitButton = form.querySelector("#action");
           dataTable.style.display = "block";
@@ -647,6 +668,13 @@ createCrudTable(
     { data: "end_date" },
     { data: "ins_start_date" },
     { data: "ins_end_date" },
+    { data: null,
+      render: function (data, type, full, meta) {
+        return (
+          '<img src="' + URL_PATH + full.banner + '" alt="Player Photo" class="img-index"/>'
+        );
+      } 
+    },
     {
       defaultContent:
         "<div class='text-center'><button class='btn btn-primary btn-sm editBtnEvent' data-bs-toggle='modal' data-bs-target='#modalEvent'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnEvent'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
@@ -767,6 +795,7 @@ createCrudTable(
     { data: "num_players", className: "text-center" },
     { data: "num_extraplayers", className: "text-center" },
     { data: "has_captain", className: "text-center" },
+    { data: "is_active", className: "text-center" },
     {
       defaultContent:
         "<div class='text-center'><button class='btn btn-primary btn-sm editBtnSport' data-bs-toggle='modal' data-bs-target='#modalSport'>Editar  <i class='fa-solid fa-pen-to-square'></i></button><button class='btn btn-danger btn-sm deleteBtnSport'>Eliminar  <i class='fa-regular fa-trash-can'></i></button></div>",
@@ -787,6 +816,7 @@ createCrudTable(
     var num_players = rowData.num_players;
     var num_extraplayers = rowData.num_extraplayers;
     var has_captain = rowData.has_captain;
+    var is_active = rowData.is_active;
 
     document.getElementById("id").value = id;
     document.getElementById("name").value = name;
@@ -795,6 +825,7 @@ createCrudTable(
     document.getElementById("num_players").value = num_players;
     document.getElementById("num_extraplayers").value = num_extraplayers;
     document.getElementById("has_captain").value = formatStatus(has_captain);
+    document.getElementById("is_active").value = formatStatus(is_active);
   }
 );
 

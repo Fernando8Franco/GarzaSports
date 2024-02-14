@@ -1,25 +1,8 @@
-<?php
-$url = URL_HOST . URL_PATH . "/events/eventsDatesWithoutFormat";
-
-$curl = curl_init($url);
-
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-$response = curl_exec($curl);
-
-if ($response === false) {
-    echo 'Error al consumir la API: ' . curl_error($curl);
-} else {
-    $data = json_decode($response, true);
-}
-
-curl_close($curl);
-?>
 <div class="container text-center">
   <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-2 border-bottom border-4 border-dark">
-      <img class="img-index" id="img-banner" src="<?= URL_PATH . $data['banner'] ?>" alt="banner">
-      <span class="fw-bold text-white event_name" id="eventName"><?= $data['name'] ?></span>
+      <img class="img-index" id="img-banner" src="" alt="banner">
+      <span class="fw-bold text-white event_name" id="eventName"></span>
     </header>
   </div>
 </div>

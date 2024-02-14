@@ -7,6 +7,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const buttonSearch = document.getElementById("search");
   const buttonRegister = document.getElementById("register");
 
+  const fetchPromise = fetchEventDates();
+  fetchPromise.then((data) => {
+    const eventName = data.name;
+    const banner = data.banner;
+    document.getElementById("eventName").textContent = "Registro " + eventName;
+    document.getElementById("img-banner").src = URL_PATH + banner;
+  });
+
   buttonSearch.addEventListener("click", function () {
     Swal.fire({
       allowOutsideClick: false,
